@@ -16,35 +16,35 @@ jobs:
         with:
           node version: 14
 
-    - name: setup git config
-    - run:
-      git config user.name "Github Actions Bot"
-      git config user.email "<>"
+      - name: setup git config
+        run:
+          git config user.name "Github Actions Bot"
+          git config user.email "<>"
 
-    - name: Dependecies
-    run: npm ci
+      - name: Dependecies
+        run: npm ci
 
-    - name: Build
-    run: npm run build
-
-    - name: Save version
-    id: version
-    run: echo :: set-output name==tag::$(echo $(node -p -e "require('./package.json').version"))
-
-    - name: Increase version
-    run: npm version patch
-
-    - name: Push new version
-    run: git push
-
-    - name: login to DockerHub Registry
-    run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -- password-stdin
-
-    - name: Build Docker image
-      run: docker build . --file Dockerfile -- tag haziqothman:${{steps.version.outputs.tag}}
-
-    - name: Push to Docker Hub
-      run: docker push haziqothman:${{steps.version.outputs.tag}}
+      - name: Build
+        run: npm run build
+  
+      - name: Save version
+        id: version
+        run: echo :: set-output name==tag::$(echo $(node -p -e "require('./package.json').version"))
+  
+      - name: Increase version
+        run: npm version patch
+  
+      - name: Push new version
+        run: git push
+  
+      - name: login to DockerHub Registry
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -- password-stdin
+  
+      - name: Build Docker image
+        run: docker build . --file Dockerfile -- tag haziqothman:${{steps.version.outputs.tag}}
+  
+      - name: Push to Docker Hub
+        run: docker push haziqothman:${{steps.version.outputs.tag}}
 
 
 
