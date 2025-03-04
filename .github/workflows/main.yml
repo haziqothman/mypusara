@@ -16,10 +16,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Keep Node.js 14
-
-      - name: Install compatible npm version
-        run: npm install -g npm@6  # Downgrade to npm v6
+          node-version: '20'  # Update Node.js to version 20
 
       - name: Setup git config
         run: |
