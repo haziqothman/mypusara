@@ -1,6 +1,6 @@
 name: CI
 
-on: 
+on:
   push:
     branches: [ "main" ]
   pull_request:
@@ -23,8 +23,12 @@ jobs:
           git config user.name "Github Actions Bot"
           git config user.email "<>"
 
-      - name: Dependencies
-        run: npm ci
+      - name: Install dependencies (npm install)
+        run: |
+          if [ ! -f package-lock.json ]; then
+            npm install  # Only runs if package-lock.json is missing
+          fi
+          npm ci  # Always run npm ci to install based on package-lock.json
 
       - name: Build
         run: npm run build
