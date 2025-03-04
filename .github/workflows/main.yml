@@ -35,7 +35,9 @@ jobs:
 
       - name: Save version
         id: version
-        run: echo "::set-output name=tag::$(node -p -e \"require('./package.json').version\")"
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "::set-output name=tag::$VERSION"
 
       - name: Increase version
         run: npm version patch
