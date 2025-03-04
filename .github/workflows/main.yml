@@ -16,7 +16,10 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: '14'  # Keep Node.js 14
+
+      - name: Install compatible npm version
+        run: npm install -g npm@6  # Downgrade to npm v6
 
       - name: Setup git config
         run: |
@@ -33,26 +36,26 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Upgrade npm to latest version
-        run: npm install -g npm@latest
-
       - name: Save version
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          echo "::set-output name=tag::$VERSION"
+          echo "TAG=$VERSION" >> $GITHUB_ENV  # Set output for later use
 
       - name: Increase version
         run: npm version patch
 
-      - name: Push new version
-        run: git push
+      - name: Commit and push version change
+        run: |
+          git add package.json package-lock.json
+          git commit -m "Bump version to ${{ env.TAG }}"
+          git push
 
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Build Docker image
-        run: docker build . --file Dockerfile --tag haziqothman:${{ steps.version.outputs.tag }}
+        run: docker build . --file Dockerfile --tag haziqothman:${{ env.TAG }}
 
       - name: Push to Docker Hub
-        run: docker push haziqothman:${{ steps.version.outputs.tag }}
+        run: docker push haziqothman:${{ env.TAG }}
