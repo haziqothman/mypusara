@@ -21,7 +21,7 @@ jobs:
       - name: Setup git config
         run: |
           git config user.name "Github Actions Bot"
-          git config user.email "<>"
+          git config user.email "<>"  # Replace with actual email if necessary
 
       - name: Install dependencies (npm install)
         run: |
@@ -40,12 +40,16 @@ jobs:
           echo "TAG=$VERSION" >> $GITHUB_ENV  # Set output for later use
 
       - name: Increase version
-        run: npm version patch
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "TAG=$VERSION" >> $GITHUB_ENV  # Set output for later use
+          npm version patch --no-git-tag-version  # Run version bump without tagging
 
       - name: Commit and push version change
         run: |
           git add package.json package-lock.json
-          git commit -m "Bump version to ${{ env.TAG }}"
+          git diff --cached  # Verify what is staged
+          git commit -m "Bump version to ${{ env.TAG }}" || echo "No changes to commit"
           git push
 
       - name: Login to DockerHub Registry
