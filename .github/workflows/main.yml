@@ -16,7 +16,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Update Node.js to version 20
+          node-version: '20'
 
       - name: Setup git config
         run: |
@@ -26,9 +26,9 @@ jobs:
       - name: Install dependencies (npm install)
         run: |
           if [ ! -f package-lock.json ]; then
-            npm install  # Only runs if package-lock.json is missing
+            npm install
           fi
-          npm ci  # Always run npm ci to install based on package-lock.json
+          npm ci
 
       - name: Build
         run: npm run build
@@ -37,18 +37,18 @@ jobs:
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          echo "TAG=$VERSION" >> $GITHUB_ENV  # Set output for later use
+          echo "TAG=$VERSION" >> $GITHUB_ENV
 
       - name: Increase version
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          echo "TAG=$VERSION" >> $GITHUB_ENV  # Set output for later use
-          npm version patch --no-git-tag-version  # Run version bump without tagging
+          echo "TAG=$VERSION" >> $GITHUB_ENV
+          npm version patch --no-git-tag-version
 
       - name: Commit and push version change
         run: |
           git add package.json package-lock.json
-          git diff --cached  # Verify what is staged
+          git diff --cached
           git commit -m "Bump version to ${{ env.TAG }}" || echo "No changes to commit"
 
       - name: Set up Git authentication
@@ -59,7 +59,7 @@ jobs:
 
       - name: Push changes
         run: |
-          git push
+          git push origin main
 
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
