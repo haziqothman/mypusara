@@ -87,10 +87,10 @@ jobs:
       # Build the Docker image
       - name: Build Docker image
         run: |
-          docker build . --file Dockerfile --tag haziqothman:${{ env.TAG }}
+          docker build . --file Dockerfile --tag haziqothman/myimage:${{ env.TAG }}
           docker images
 
       # Push the Docker image to Docker Hub
       - name: Push to Docker Hub
         run: |
-          docker push haziqothman:${{ env.TAG }}
+          docker push haziqothman/myimage:${{ env.TAG }}
