@@ -12,17 +12,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code
       - uses: actions/checkout@v3
 
+      # Set up Node.js
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
 
+      # Set up Git config
       - name: Setup git config
         run: |
           git config user.name "Github Actions Bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # Install dependencies
       - name: Install dependencies (npm install)
         run: |
           if [ ! -f package-lock.json ]; then
@@ -30,28 +34,32 @@ jobs:
           fi
           npm ci
 
+      # Build the project
       - name: Build
         run: npm run build
 
+      # Save version tag
       - name: Save version
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "TAG=$VERSION" >> $GITHUB_ENV
 
+      # Increase version
       - name: Increase version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "TAG=$VERSION" >> $GITHUB_ENV
           npm version patch --no-git-tag-version
 
+      # Commit and push version changes
       - name: Commit and push version change
         run: |
           git add package.json package-lock.json
           git diff --cached
           git commit -m "Bump version to ${{ env.TAG }}" || echo "No changes to commit"
 
-      # Set up Git authentication with GH_TOKEN
+      # Set up Git authentication for pushing changes
       - name: Set up Git authentication
         run: |
           git config --global user.name "Github Actions Bot"
@@ -63,14 +71,21 @@ jobs:
         run: |
           git push origin main
 
-      # Docker Hub login (already using your token)
+      # Login to Docker Hub Registry
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      # Build Docker image
-      - name: Build Docker image
-        run: docker build . --file Dockerfile --tag haziqothman:${{ env.TAG }}
+      # Check the tag to ensure it's correctly set
+      - name: Check tag
+        run: echo "Tag is ${{ env.TAG }}"
 
-      # Push to Docker Hub
+      # Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build . --file Dockerfile --tag haziqothman:${{ env.TAG }}
+          docker images
+
+      # Push the Docker image to Docker Hub
       - name: Push to Docker Hub
-        run: docker push haziqothman:${{ env.TAG }}
+        run: |
+          docker push haziqothman:${{ env.TAG }}
