@@ -51,7 +51,7 @@ jobs:
           git diff --cached
           git commit -m "Bump version to ${{ env.TAG }}" || echo "No changes to commit"
 
-      # Set the correct Git remote URL using the proper repository name
+      # Set up Git authentication with GH_TOKEN
       - name: Set up Git authentication
         run: |
           git config --global user.name "Github Actions Bot"
@@ -63,11 +63,14 @@ jobs:
         run: |
           git push origin main
 
+      # Docker Hub login (already using your token)
       - name: Login to DockerHub Registry
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
+      # Build Docker image
       - name: Build Docker image
         run: docker build . --file Dockerfile --tag haziqothman:${{ env.TAG }}
 
+      # Push to Docker Hub
       - name: Push to Docker Hub
         run: docker push haziqothman:${{ env.TAG }}
