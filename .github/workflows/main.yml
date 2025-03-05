@@ -51,16 +51,12 @@ jobs:
           git diff --cached
           git commit -m "Bump version to ${{ env.TAG }}" || echo "No changes to commit"
 
-      # Check git status before proceeding with push
-      - name: Check git status
-        run: git status
-
-      # Git authentication setup (with updated token)
+      # Set the correct Git remote URL using the proper repository name
       - name: Set up Git authentication
         run: |
           git config --global user.name "Github Actions Bot"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/haziqothman/mypusara.git
 
       # Push changes to the repository
       - name: Push changes
