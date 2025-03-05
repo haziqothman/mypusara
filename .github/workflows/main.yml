@@ -66,6 +66,11 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/haziqothman/mypusara.git
 
+      # Fetch latest changes from the remote and merge them
+      - name: Fetch and merge latest changes
+        run: |
+          git pull origin main --rebase
+
       # Push changes to the repository
       - name: Push changes
         run: |
