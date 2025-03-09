@@ -1,18 +1,15 @@
-# Use official Node.js image
-FROM node:18
-
-# Set working directory inside the container
-WORKDIR /app
-
-# Copy package.json and install dependencies
-COPY package.json yarn.lock ./
-RUN yarn install
-
-# Copy all files to container
+FROM node:alpine AS build
+WORKDIR /frontend
+COPY package.json ./
+RUN npm i
 COPY . .
+RUN npm run build
 
-# Expose port for React app
-EXPOSE 3000
+FROM nginx:alpine
+COPY --from=build /frontend/build /usr/share/nginx/html
 
-# Start the React development server
-CMD ["yarn", "start"]
+# Expose port 80 for the Nginx server
+EXPOSE 80
+
+# Start Nginx when the container runs
+CMD ["nginx", "-g", "daemon off;"]
