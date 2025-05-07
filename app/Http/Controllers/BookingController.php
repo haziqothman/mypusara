@@ -107,6 +107,7 @@ class BookingController extends Controller
             'nama_simati' => 'required|string|max:255',
             'no_mykad_simati' => 'required|string|max:20', // Required field
             'no_sijil_kematian' => 'required|string|max:20',
+            'waris_address' => 'required|string|max:255',
             'notes' => 'nullable|string|max:500',
             'eventDate' => 'required|date|after_or_equal:today',
             'eventTime' => 'required|date_format:H:i',
@@ -122,6 +123,7 @@ class BookingController extends Controller
             'nama_simati' => $validated['nama_simati'],
             'no_mykad_simati' => $validated['no_mykad_simati'],  // Ensure the field is included
             'no_sijil_kematian' => $validated['no_sijil_kematian'],
+            'waris_address' => $validated['waris_address'],
             'notes' => $validated['notes'] ?? null,
             'eventDate' => $validated['eventDate'],
             'eventTime' => $validated['eventTime'],
@@ -208,6 +210,7 @@ class BookingController extends Controller
         $booking->area = $request->input('area');
         $booking->no_mykad_simati = $request->input('no_mykad_simati');
         $booking->no_sijil_kematian = $request->input('no_sijil_kematian');
+        $booking->waris_address = $request->input('waris_address');
         $booking->nama_simati = $request->input('nama_simati');
         $booking->notes = $request->input('notes');
         $booking->eventDate = $request->input('eventDate');
@@ -241,6 +244,7 @@ class BookingController extends Controller
         $booking->area = $request->input('area');
         $booking->no_mykad_simati = $request->input('no_mykad_simati');
         $booking->no_sijil_kematian = $request->input('no_sijil_kematian');
+        $booking->waris_address = $request->input('waris_address');
         $booking->nama_simati = $request->input('nama_simati');
         $booking->notes = $request->input('notes');
         $booking->eventDate = $request->input('eventDate');
@@ -251,7 +255,7 @@ class BookingController extends Controller
         $booking->save();
     
         // Redirect or return a response
-        return redirect()->route('ManageBooking.Admin.dashboardBooking')->with('success', 'Tempahan berjaya dikemaskini');
+        return redirect()->route('admin.bookings.index')->with('success', 'Tempahan berjaya dikemaskini');
     }
 
     public function cancel($id)
@@ -372,8 +376,3 @@ class BookingController extends Controller
 
 
     }
-
-
-
-
-

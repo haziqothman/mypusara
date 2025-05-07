@@ -84,6 +84,30 @@
                     @enderror
                 </div>
 
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="latitude" class="form-label">Latitude</label>
+                            <input type="number" step="any" class="form-control @error('latitude') is-invalid @enderror" 
+                                id="latitude" name="latitude" value="{{ old('latitude') }}">
+                            @error('latitude')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="longitude" class="form-label">Longitude</label>
+                            <input type="number" step="any" class="form-control @error('longitude') is-invalid @enderror" 
+                                id="longitude" name="longitude" value="{{ old('longitude') }}">
+                            @error('longitude')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <!-- MCDM Criteria Section -->
                 <div class="card mb-4 border-primary">
                     <div class="card-header bg-light">
@@ -175,4 +199,17 @@
         </div>
     </div>
 </div>
+@endsection
+
+<!-- Add this script at the bottom of the file to enable map selection -->
+@section('scripts')
+<script>
+    // You can integrate with Google Maps or Leaflet here to allow selecting coordinates on a map
+    // This is a basic implementation that would need to be expanded
+    function initMap() {
+        // Map initialization code would go here
+        // When user clicks on map, update the latitude/longitude fields
+    }
+</script>
+<!-- Include your map library of choice -->
 @endsection

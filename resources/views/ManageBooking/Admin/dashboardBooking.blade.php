@@ -35,11 +35,11 @@
                         <th>contactNumber</th> -->
                         <th>area</th>
                         <th>nama_simati</th>
-                        <th>Ulasan</th>
+                        <th>No Pusara</th>
                         <th>Tarikh</th>
                         <th>Masa</th>
                         <th>Lokasi</th>
-                        <!-- <th>Status</th> -->
+                        <th>Ulasan</th>
                         <th>Status</th>
                         </tr>
                     </thead>
@@ -52,10 +52,11 @@
                             <td>{{ $booking->contactNumber }}</td> -->
                             <td>{{ $booking->area }}</td>
                             <td>{{ $booking->nama_simati }}</td>
-                            <td>{{ $booking->notes ?? '-' }}</td>
+                            <td>{{ $booking->noPusara }}</td>
                             <td>{{ $booking->eventDate }}</td>
                             <td>{{ $booking->eventTime }}</td>
                             <td>{{ $booking->eventLocation }}</td>
+                            <td>{{ $booking->notes ?? '-' }}</td>
                                 <td>
                                     @if($booking->status == 'confirmed')
                                         <span class="badge bg-success">Reserved</span>

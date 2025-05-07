@@ -96,6 +96,49 @@
                     @enderror
                 </div>
 
+                <!-- Location Coordinates -->
+                <div class="card mb-4 border-primary">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0 text-primary">
+                            <i class="fas fa-map-marker-alt me-2"></i>Koordinat Lokasi
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="latitude" class="form-label">Latitude</label>
+                                    <input type="number" step="any" class="form-control @error('latitude') is-invalid @enderror" 
+                                           id="latitude" name="latitude" value="{{ old('latitude', $package->latitude) }}">
+                                    @error('latitude')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Contoh: 3.1390</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="longitude" class="form-label">Longitude</label>
+                                    <input type="number" step="any" class="form-control @error('longitude') is-invalid @enderror" 
+                                           id="longitude" name="longitude" value="{{ old('longitude', $package->longitude) }}">
+                                    @error('longitude')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Contoh: 101.6869</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            @if($package->latitude && $package->longitude)
+                                <a href="https://www.google.com/maps?q={{ $package->latitude }},{{ $package->longitude }}" 
+                                   target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-external-link-alt me-1"></i> Lihat di Google Maps
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 <!-- MCDM Criteria Section -->
                 <div class="card mb-4 border-primary">
                     <div class="card-header bg-light">

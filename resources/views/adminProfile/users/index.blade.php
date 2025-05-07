@@ -8,11 +8,11 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h2 class="mb-0 fw-bold text-primary">
-                        <i class="fas fa-users me-2"></i> User Management
+                        <i class="fas fa-users me-2"></i> Penggurusan Pengguna
                     </h2>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Utama</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Users</li>
                         </ol>
                     </nav>
@@ -24,7 +24,7 @@
                         <i class="fas fa-arrow-left"></i>
                     </a>
                     <a href="{{ route('adminProfile.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Add Admin
+                        <i class="fas fa-plus me-1"></i> Tambah Pentadbir
                     </a>
                 </div>
                 @endif
@@ -35,7 +35,7 @@
                 <div class="card-header bg-primary text-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-list-check me-2"></i> Users List
+                            <i class="fas fa-list-check me-2"></i> Senarai Pengguna
                         </h5>
                         <span class="badge bg-white text-primary">
                             {{ $users->count() }} {{ Str::plural('User', $users->count()) }}
@@ -47,10 +47,10 @@
                     @if($users->isEmpty())
                         <div class="text-center py-5">
                             <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No Users Found</h5>
-                            <p class="text-muted">Start by adding new users to your system</p>
+                            <h5 class="text-muted">Tiada Pengguna Ditemui</h5>
+                            <p class="text-muted">Mulakan dengan menambah pengguna baharu ke dalam sistem</p>
                             <a href="{{ route('adminProfile.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus me-1"></i> Add User
+                                <i class="fas fa-plus me-1"></i> Tambah Pengguna
                             </a>
                         </div>
                     @else
@@ -58,11 +58,11 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="ps-4">User</th>
-                                        <th>Contact</th>
-                                        <th>Location</th>
-                                        <th>Role</th>
-                                        <th class="text-end pe-4">Actions</th>
+                                        <th class="ps-4">Pengguna</th>
+                                        <th>No Telefon</th>
+                                        <th>Alamat</th>
+                                        <th>Peranan</th>
+                                        <th class="text-end pe-4">Tindakan</th>
                                     </tr>
                                 </thead>
                                 <tbody>

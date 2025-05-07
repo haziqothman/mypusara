@@ -21,7 +21,14 @@ class Package extends Model
         'shade_coverage', // full, partial, none
         'packageDesc',
         'packageImage',
-        'userId'
+        'userId',
+        'latitude',
+        'longitude',
+    ];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     public function bookings()
@@ -53,6 +60,9 @@ class Package extends Model
             default => 0
         };
     }
+
+
+   
 
     public function getAccessibilityWidth()
     {

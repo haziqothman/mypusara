@@ -52,10 +52,11 @@
                                 <tr>
                                     <th class="ps-4">Kawasan</th>
                                     <th>Nama Simati</th>
-                                    <th>Ulasan</th>
+                                    <th>No Pusara</th>
                                     <th>Tarikh</th>
                                     <th>Masa</th>
                                     <th>Lokasi</th>
+                                    <th>Ulasan</th>
                                     <th>Status</th>
                                     <th class="text-end pe-4">Tindakan</th>
                                 </tr>
@@ -65,11 +66,7 @@
                                     <tr class="align-middle">
                                         <td class="ps-4 fw-bold">{{ $booking->area }}</td>
                                         <td>{{ $booking->nama_simati }}</td>
-                                        <td>
-                                            <div class="text-truncate" style="max-width: 200px;" title="{{ $booking->notes ?? '-' }}">
-                                                {{ $booking->notes ?? '-' }}
-                                            </div>
-                                        </td>
+                                        <td>{{ $booking->package ? $booking->package->pusaraNo : 'N/A' }}</td>
                                         <td>{{ \Carbon\Carbon::parse($booking->eventDate)->format('d M Y') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($booking->eventTime)->format('h:i A') }}</td>
                                         <td>
@@ -78,17 +75,22 @@
                                             </div>
                                         </td>
                                         <td>
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ $booking->notes ?? '-' }}">
+                                                {{ $booking->notes ?? '-' }}
+                                            </div>
+                                        </td>
+                                        <td>
                                             @if($booking->status == 'confirmed')
                                                 <span class="badge rounded-pill bg-success bg-opacity-10 text-success py-2 px-3">
-                                                    <i class="fas fa-check-circle me-1"></i> Reserved
+                                                    <i class="fas fa-check-circle me-1"></i> Disahkan
                                                 </span>
                                             @elseif($booking->status == 'pending')
                                                 <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning py-2 px-3">
-                                                    <i class="fas fa-clock me-1"></i> Pending
+                                                    <i class="fas fa-clock me-1"></i> Dalam Proses
                                                 </span>
                                             @else
                                                 <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger py-2 px-3">
-                                                    <i class="fas fa-times-circle me-1"></i> Cancelled
+                                                    <i class="fas fa-times-circle me-1"></i> Dibatalkan
                                                 </span>
                                             @endif
                                         </td>

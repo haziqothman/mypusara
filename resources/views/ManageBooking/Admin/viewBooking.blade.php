@@ -1,83 +1,166 @@
 @extends('layouts.navigation')
 
 @section('content')
-    <div class="container my-5">
+    <div class="container py-5">
         {{-- Page Header --}}
         <div class="text-center mb-5">
-            <h1 class="display-5 font-weight-bold">Detail Tempahan</h1>
-            <p class="text-muted">Berikut adalah maklumat lengkap mengenai tempahan yang anda pilih.</p>
+            <h1 class="display-5 fw-bold text-gradient-primary mb-3">
+                <i class="fas fa-calendar-check me-2"></i> Detail Tempahan
+            </h1>
+            <div class="divider mx-auto" style="width: 80px; height: 3px; background: linear-gradient(90deg, #4e73df, #1cc88a);"></div>
+            <p class="text-muted mt-3">Maklumat lengkap mengenai tempahan anda</p>
         </div>
 
         {{-- Display success or error messages --}}
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-success alert-dismissible fade show glass-effect" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <div>{{ session('success') }}</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             </div>
         @elseif (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-danger alert-dismissible fade show glass-effect" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <div>{{ session('error') }}</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             </div>
         @endif
 
         {{-- Booking Details --}}
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Maklumat Tempahan </h5>
+        <div class="card border-0 shadow-lg overflow-hidden glass-effect mb-4">
+            <div class="card-header bg-gradient-primary py-3">
+                <h5 class="mb-0 text-white"><i class="fas fa-info-circle me-2"></i> Maklumat Tempahan</h5>
             </div>
-            <div class="card-body">
-                <div class="row gy-4">
+            <div class="card-body p-4">
+                <div class="row g-4">
                     {{-- Customer Info --}}
                     <div class="col-md-6">
-                        <h6 class="text-primary">Detail Waris</h6>
-                        <ul class="list-unstyled">
-                            <li><strong>Nama:</strong> {{ $booking->customerName }}</li>
-                            <li><strong>Email:</strong> {{ $booking->customerEmail }}</li>
-                            <li><strong>No Telefon:</strong> {{ $booking->contactNumber }}</li>
-                        </ul>
+                        <div class="detail-section">
+                            <h6 class="section-title bg-light-primary">
+                                <i class="fas fa-user-circle me-2"></i> Maklumat Waris
+                            </h6>
+                            <div class="detail-item">
+                                <span class="detail-label">Nama:</span>
+                                <span class="detail-value">{{ $booking->customerName }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value">{{ $booking->customerEmail }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">No Telefon:</span>
+                                <span class="detail-value">{{ $booking->contactNumber }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Alamat Waris:</span>
+                                <span class="detail-value">{{ $booking->waris_address }}</span>
+                            </div>
+                        </div>
                     </div>
 
-                    {{-- Booking Details --}}
+                    {{-- Deceased Info --}}
                     <div class="col-md-6">
-                        <h6 class="text-primary">Detail Si mati</h6>
-                        <ul class="list-unstyled">
-                            <li><strong>Nama Si Mati:</strong> {{ $booking->nama_simati }}</li>
-                            <li><strong>No kad pengenalan si mati:</strong> {{ $booking->no_mykad_simati }}</li>
-                        </ul>
+                        <div class="detail-section">
+                            <h6 class="section-title bg-light-primary">
+                                <i class="fas fa-angel me-2"></i> Maklumat Si Mati
+                            </h6>
+                            <div class="detail-item">
+                                <span class="detail-label">Nama:</span>
+                                <span class="detail-value">{{ $booking->nama_simati }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">No Kad Pengenalan:</span>
+                                <span class="detail-value">{{ $booking->no_mykad_simati }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <hr class="my-4">
+                <div class="divider my-4" style="height: 1px; background: rgba(0,0,0,0.1);"></div>
 
-                <div class="row gy-4">
-                    {{-- Pax & Status --}}
+                <div class="row g-4">
+                    {{-- Booking Details --}}
                     <div class="col-md-6">
-                        <h6 class="text-primary">Detail Tempahan</h6>
-                        <ul class="list-unstyled">
-                            <li><strong>No Pusara:</strong> {{ $booking->package ? $booking->package->pusaraNo : 'N/A' }}</li>
-                            <li><strong>Location:</strong> {{ $booking->eventLocation }}</li>
-                            <li><strong>Tarikh:</strong> {{ $booking->eventDate }}</li>
-                            <li><strong>Masa:</strong> {{ $booking->eventTime }}</li>
-                            <li><strong>Lokasi:</strong> {{ $booking->eventLocation }}</li>
-                            <li><strong>Status:</strong> 
-                                @if ($booking->status === 'confirmed')
-                                    <span class="badge bg-success">Reserved</span>
-                                @elseif ($booking->status === 'pending')
-                                    <span class="badge bg-warning">Pending</span>
-                                @else
-                                    <span class="badge bg-danger">Cancelled</span>
-                                @endif
-                            </li>
-                        </ul>
+                        <div class="detail-section">
+                            <h6 class="section-title bg-light-primary">
+                                <i class="fas fa-calendar-alt me-2"></i> Butiran Tempahan
+                            </h6>
+                            <div class="detail-item">
+                                <span class="detail-label">No Pusara:</span>
+                                <span class="detail-value">{{ $booking->package ? $booking->package->pusaraNo : 'N/A' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Lokasi:</span>
+                                <span class="detail-value">{{ $booking->eventLocation }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tarikh:</span>
+                                <span class="detail-value">{{ $booking->eventDate }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Masa:</span>
+                                <span class="detail-value">{{ $booking->eventTime }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status:</span>
+                                <span class="detail-value">
+                                    @if ($booking->status === 'confirmed')
+                                        <span class="badge rounded-pill bg-success bg-opacity-10 text-success py-2 px-3">
+                                            <i class="fas fa-check-circle me-1"></i> Reserved
+                                        </span>
+                                    @elseif ($booking->status === 'pending')
+                                        <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning py-2 px-3">
+                                            <i class="fas fa-clock me-1"></i> Pending
+                                        </span>
+                                    @else
+                                        <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger py-2 px-3">
+                                            <i class="fas fa-times-circle me-1"></i> Cancelled
+                                        </span>
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
-                    {{-- Notes --}}
+                    {{-- Location and Notes --}}
                     <div class="col-md-6">
-                        <h6 class="text-primary">Additional Notes</h6>
-                        <p class="text-muted">
-                            {{ $booking->notes ?: 'No additional notes provided.' }}
-                        </p>
+                        <div class="detail-section">
+                            <h6 class="section-title bg-light-primary">
+                                <i class="fas fa-map-marker-alt me-2"></i> Koordinat Lokasi
+                            </h6>
+                            <div class="detail-item">
+                                <span class="detail-label">Latitude:</span>
+                                <span class="detail-value">{{ $booking->package->latitude ?? 'N/A' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Longitude:</span>
+                                <span class="detail-value">{{ $booking->package->longitude ?? 'N/A' }}</span>
+                            </div>
+                            @if($booking->package && $booking->package->latitude && $booking->package->longitude)
+                            <div class="detail-item">
+                                <span class="detail-label">Peta:</span>
+                                <span class="detail-value">
+                                    <a href="https://www.google.com/maps?q={{ $booking->package->latitude }},{{ $booking->package->longitude }}" 
+                                       target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-external-link-alt me-1"></i> Buka di Google Maps
+                                    </a>
+                                </span>
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="detail-section mt-4">
+                            <h6 class="section-title bg-light-primary">
+                                <i class="fas fa-sticky-note me-2"></i> Catatan Tambahan
+                            </h6>
+                            <div class="notes-box">
+                                {{ $booking->notes ?: 'Tiada catatan tambahan.' }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,58 +183,181 @@
             </button>  
         </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteBookingModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i> Sahkan Penghapusan
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteBookingModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i> Sahkan Penghapusan
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ route('admin.bookings.destroy', $booking->id) }}">
+                        @csrf
+                        @method('DELETE')
+                        <div class="modal-body">
+                            <div class="alert alert-danger bg-danger bg-opacity-10 border-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <strong>Amaran!</strong> Tindakan ini tidak boleh diundur.
+                            </div>
+                            <p>Adakah anda pasti ingin memadam tempahan ini secara kekal?</p>
+                            <ul class="list-group list-group-flush mb-3">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-bold">No. Tempahan:</span>
+                                    <span>#{{ $booking->id }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-bold">Nama Waris:</span>
+                                    <span>{{ $booking->customerName }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-bold">Nama Si Mati:</span>
+                                    <span>{{ $booking->nama_simati }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="fw-bold">Lokasi Pusara:</span>
+                                    <span>{{ $booking->package ? $booking->package->pusaraNo : 'N/A' }}</span>
+                                </li>
+                            </ul>
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                                <label class="form-check-label" for="confirmDelete">
+                                    Saya memahami bahawa data akan dihapuskan secara kekal
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i> Batal
+                            </button>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4">
+                                <i class="fas fa-trash-alt me-1"></i> Sahkan Penghapusan
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <form method="POST" action="{{ route('admin.bookings.destroy', $booking->id) }}">
-                @csrf
-                @method('DELETE')
-                <div class="modal-body">
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <strong>Amaran!</strong> Tindakan ini tidak boleh diundur.
-                    </div>
-                    <p>Adakah anda pasti ingin memadam tempahan ini secara kekal?</p>
-                    <ul class="list-unstyled">
-                        <li><strong>No. Tempahan:</strong> #{{ $booking->id }}</li>
-                        <li><strong>Nama Waris:</strong> {{ $booking->customerName }}</li>
-                        <li><strong>Nama Si Mati:</strong> {{ $booking->nama_simati }}</li>
-                    </ul>
-                    <div class="form-check mt-3">
-                        <input class="form-check-input" type="checkbox" id="confirmDelete" required>
-                        <label class="form-check-label" for="confirmDelete">
-                            Saya memahami bahawa data akan dihapuskan secara kekal
-                        </label>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Batal
-                    </button>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash-alt me-1"></i> Sahkan Penghapusan
-                    </button>
-                
-
-                </div>
-            </form>
         </div>
     </div>
-</div>
-    </div>
-@endsection
 
-<script>
-function confirmDelete() {
-    if (confirm('Are you sure you want to delete this booking?')) {
-        document.getElementById('deleteForm').submit();
-    }
-}
-</script>
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --primary-gradient: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            --primary-light: rgba(78, 115, 223, 0.1);
+            --success-color: #1cc88a;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+        }
+        
+        .text-gradient-primary {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .bg-gradient-primary {
+            background: var(--primary-gradient);
+        }
+        
+        .bg-light-primary {
+            background-color: var(--primary-light);
+        }
+        
+        .card {
+            border-radius: 16px;
+            overflow: hidden;
+            border: none;
+        }
+        
+        .card-header {
+            border-bottom: none;
+        }
+        
+        .detail-section {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            height: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            margin: 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #4b5563;
+        }
+        
+        .detail-value {
+            color: #2d3748;
+            text-align: right;
+        }
+        
+        .notes-box {
+            padding: 1.5rem;
+            color: #4b5563;
+            min-height: 150px;
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .badge {
+            font-weight: 500;
+        }
+        
+        .modal-content {
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .list-group-item {
+            padding: 0.75rem 1.25rem;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize any necessary JavaScript here
+        });
+    </script>
+@endsection

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\FeedbackController;
-use App\Http\Controllers\GraveController;
+use App\Http\Controllers\PublicController;
 use App\Http\Controllers\MCDMController;
 use App\Http\Controllers\AdminSelectionController;
 
@@ -106,6 +106,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
         Route::delete('/destroy/{id}/package', [CatalogueController::class, 'destroyPackage'])->name('admin.destroy.package');
         Route::delete('admin/package/{id}', [CatalogueController::class, 'destroy'])->name('admin.package.destroy');
         Route::delete('/admin/package/{id}', [CatalogueController::class, 'destroyPackage'])->name('admin.destroy.package');
+        Route::get('/package/map', [CatalogueController::class, 'showMap'])->name('package.map');
 
         // Manage Booking
         Route::get('/admin/dashboard', [BookingController::class, 'showAdmin'])->name('ManageBooking.Admin.dashboardBooking');
@@ -166,8 +167,8 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
 
   // Anonymous Dashboard Route
   Route::get('/', function () {
-    return view('anonymous_dashboard');
-})->name('anonymous.dashboard');
+    return view('landing');
+})->name('landing');
 
 
 Route::post('/admin/bookings/{id}/notify-grave-digger', [BookingController::class, 'notifyGraveDigger'])
@@ -187,10 +188,20 @@ Route::get('/admin/home', [HomeController::class, 'adminHome'])->name('admin.hom
 // For showing single booking
 Route::get('/bookings/{id}', [HomeController::class, 'show'])->name('bookings.show');
 
-// For search
-Route::get('/search/pusara', [GraveController::class, 'search'])->name('search.pusara');
-Route::get('/search/pusara', [App\Http\Controllers\GraveController::class, 'search'])
-     ->name('search.pusara');
+// Public routes
+Route::get('/', [PublicController::class, 'landing'])->name('landing');
+Route::get('/search-pusara', [PublicController::class, 'search'])->name('search.pusara');
+Route::get('/pusara/{id}', [PublicController::class, 'show'])->name('pusara.show');
+
+// Temporary debug route - Add this to routes/web.php
+Route::get('/debug-muhammad-ali', function() {
+    $results = \App\Models\Package::whereHas('bookings', function($query) {
+        $query->where('nama_simati', 'like', '%Muhammad Ali%')
+              ->where('status', 'confirmed');
+    })->with('bookings')->get();
+
+    dd($results); // Check if records exist
+});
 
      // MCDM Routes
 Route::middleware(['auth', 'user-access:customer'])->group(function () {

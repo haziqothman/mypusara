@@ -40,7 +40,6 @@
         </div>
     </div>
     
-
     {{-- Bookings Table --}}
     <div class="card shadow-lg border-0 overflow-hidden">
         @if ($bookings->isNotEmpty())
@@ -50,6 +49,7 @@
                         <tr>
                             <th class="ps-4">#</th>
                             <th>Nama Waris</th>
+                            <th>Nama Si mati</th>
                             <th>Tarikh Kematian</th>
                             <th>Lokasi Kematian</th>
                             <th>No. Pusara</th>
@@ -72,6 +72,7 @@
                                         </div>
                                     </div>
                                 </td>
+                                <td>{{ $booking->nama_simati }}</td> 
                                 <td>{{ \Carbon\Carbon::parse($booking->eventDate)->format('d/m/Y') }}</td>
                                 <td>{{ Str::limit($booking->eventLocation, 20) }}</td>
                                 <td>
@@ -121,7 +122,6 @@
                                         </a>
 
                                         <!-- Approve Button -->
-                                      <!-- Approve Button with Confirmation Modal -->
                                         @if ($booking->status == 'pending')
                                             <button type="button" 
                                                     class="btn btn-sm btn-success" 
@@ -131,52 +131,13 @@
                                                     title="Sahkan Tempahan">
                                                 <i class="fas fa-check"></i>
                                             </button>
-                                            
-                                            <!-- Approve Confirmation Modal -->
-                                            <div class="modal fade" id="approveConfirmationModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header bg-success text-white">
-                                                            <h5 class="modal-title">
-                                                                <i class="fas fa-check-circle me-2"></i> Sahkan Tempahan
-                                                            </h5>
-                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <form method="POST" action="{{ route('admin.bookings.approve', ['id' => $booking->id]) }}">
-                                                            @csrf
-                                                            <div class="modal-body">
-                                                                <div class="alert alert-warning">
-                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                    <strong>Pengesahan Diperlukan</strong>
-                                                                </div>
-                                                                
-                                                                <div class="mb-3 form-check">
-                                                                    <input type="checkbox" class="form-check-input" id="confirmBurial{{ $booking->id }}" required>
-                                                                    <label class="form-check-label" for="confirmBurial{{ $booking->id }}">
-                                                                        Saya mengesahkan jenazah telah dikebumikan
-                                                                    </label>
-                                                                </div>
-                                                                
-                                                                
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                                    <i class="fas fa-times me-1"></i> Batal
-                                                                </button>
-                                                                <button type="submit" class="btn btn-success">
-                                                                    <i class="fas fa-check me-1"></i> Sahkan
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         @else
                                             <button class="btn btn-sm btn-light-secondary" disabled data-bs-toggle="tooltip" data-bs-placement="top" title="Telah Disahkan">
                                                 <i class="fas fa-check-double"></i>
                                             </button>
                                         @endif
-                                         <!-- Notify Button -->
+
+                                        <!-- Notify Button -->
                                         <button type="button" 
                                             class="btn btn-sm {{ $booking->status == 'pending' ? 'btn-success' : 'btn-danger' }}" 
                                             data-bs-toggle="modal" 
@@ -184,75 +145,59 @@
                                             data-bs-placement="top" 
                                             title="Hantar Notifikasi Kepada Penggali Pusara"
                                             @if($booking->status != 'pending') disabled @endif>
-                                        <i class="fas fa-envelope me-1"></i> Maklumkan
-                                    </button>
-                                </div>
-                            </td>
+                                            <i class="fas fa-envelope me-1"></i> Maklumkan
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @else
-            <div class="text-center py-5">
-                <div class="avatar avatar-xl bg-light-primary rounded-circle mb-3">
-                    <i class="fas fa-calendar-times fa-2x text-primary"></i>
-                </div>
-                <h5 class="fw-semibold">Tiada Rekod Tempahan Ditemui</h5>
-                <p class="text-muted">Tiada tempahan yang sepadan dengan kriteria tapisan anda</p>
-            </div>
-        @endif
-    </div>
 
- <!-- Grave Digger Notification Modal -->
-<div class="modal fade" id="graveDiggerModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Hantar Notifikasi Penggali Pusara</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="POST" action="{{ route('admin.bookings.notify_grave_digger', $booking->id) }}">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold text-primary mb-2">
-                            <i class="fas fa-phone-alt me-2"></i> Nombor Telefon Penggali
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light-primary border-primary">
-                                <i class="fas fa-mobile-alt text-primary"></i>
-                            </span>
-                            <input type="tel" 
-                                name="grave_digger_phone" 
-                                class="form-control border-primary py-2" 
-                                value="{{ old('grave_digger_phone', '+601137490379') }}" 
-                                required
-                                pattern="^\+?6?01[0-9]{8,9}$"
-                                placeholder="+60123456789">
-                        </div>
-                        <small class="text-muted mt-1 d-block">
-                            <i class="fas fa-info-circle me-1"></i> Format: +60123456789 atau 0123456789
-                        </small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold text-primary mb-2">
-                            <i class="fas fa-envelope me-2"></i> Mesej
-                        </label>
-                        <div class="card border-primary">
-                            <div class="card-header bg-light-primary py-2">
-                                <small class="text-primary fw-semibold">
-                                    <i class="fab fa-whatsapp me-1"></i> Template Pesanan
-                                </small>
-                            </div>
-                            <textarea name="message" 
-                            class="form-control border-0 shadow-none" 
-                            rows="8"
-                            style="resize: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"
-                            required>
+                            <!-- Grave Digger Notification Modal -->
+                            <div class="modal fade" id="graveDiggerModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title">Hantar Notifikasi Penggali Pusara</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="POST" action="{{ route('admin.bookings.notify_grave_digger', $booking->id) }}">
+                                            @csrf
+                                            <div class="modal-body">
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-semibold text-primary mb-2">
+                                                        <i class="fas fa-phone-alt me-2"></i> Nombor Telefon Penggali
+                                                    </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-light-primary border-primary">
+                                                            <i class="fas fa-mobile-alt text-primary"></i>
+                                                        </span>
+                                                        <input type="tel" 
+                                                            name="grave_digger_phone" 
+                                                            class="form-control border-primary py-2" 
+                                                            value="{{ old('grave_digger_phone', '+601137490379') }}" 
+                                                            required
+                                                            pattern="^\+?6?01[0-9]{8,9}$"
+                                                            placeholder="+60123456789">
+                                                    </div>
+                                                    <small class="text-muted mt-1 d-block">
+                                                        <i class="fas fa-info-circle me-1"></i> Format: +60123456789 atau 0123456789
+                                                    </small>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-semibold text-primary mb-2">
+                                                        <i class="fas fa-envelope me-2"></i> Mesej
+                                                    </label>
+                                                    <div class="card border-primary">
+                                                        <div class="card-header bg-light-primary py-2">
+                                                            <small class="text-primary fw-semibold">
+                                                                <i class="fab fa-whatsapp me-1"></i> Template Pesanan
+                                                            </small>
+                                                        </div>
+                                                        <textarea name="message" 
+                                                        class="form-control border-0 shadow-none" 
+                                                        rows="8"
+                                                        style="resize: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"
+                                                        required>
 *PERMINTAAN GALI PUSARA*
 
 📌 *No. Tempahan:* #{{ $booking->id }}
@@ -269,23 +214,77 @@
 
 Sila siapkan penggalian sebelum tarikh tersebut. 
 Terima Kasih.
-                            </textarea>
-                        </div>
-                        <small class="text-muted mt-1 d-block">
-                            <i class="fas fa-lightbulb me-1"></i> Gunakan emoji (📌⚰️📍👤🆔📅⏰) untuk penekanan
-                        </small>
-                    </div>
+                                                        </textarea>
+                                                    </div>
+                                                    <small class="text-muted mt-1 d-block">
+                                                        <i class="fas fa-lightbulb me-1"></i> Gunakan emoji (📌⚰️📍👤🆔📅⏰) untuk penekanan
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fab fa-whatsapp me-2"></i> Hantar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Approve Confirmation Modal -->
+                            @if ($booking->status == 'pending')
+                                <div class="modal fade" id="approveConfirmationModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-success text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-check-circle me-2"></i> Sahkan Tempahan
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form method="POST" action="{{ route('admin.bookings.approve', ['id' => $booking->id]) }}">
+                                                @csrf
+                                                <div class="modal-body">
+                                                    <div class="alert alert-warning">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        <strong>Pengesahan Diperlukan</strong>
+                                                    </div>
+                                                    
+                                                    <div class="mb-3 form-check">
+                                                        <input type="checkbox" class="form-check-input" id="confirmBurial{{ $booking->id }}" required>
+                                                        <label class="form-check-label" for="confirmBurial{{ $booking->id }}">
+                                                            Saya mengesahkan jenazah telah dikebumikan
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                        <i class="fas fa-times me-1"></i> Batal
+                                                    </button>
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="fas fa-check me-1"></i> Sahkan
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="text-center py-5">
+                <div class="avatar avatar-xl bg-light-primary rounded-circle mb-3">
+                    <i class="fas fa-calendar-times fa-2x text-primary"></i>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fab fa-whatsapp me-2"></i> Hantar
-                    </button>
-                </div>
-            </form>
-        </div>
+                <h5 class="fw-semibold">Tiada Rekod Tempahan Ditemui</h5>
+                <p class="text-muted">Tiada tempahan yang sepadan dengan kriteria tapisan anda</p>
+            </div>
+        @endif
     </div>
-</div>
 </div>
 @endsection
 
@@ -366,7 +365,6 @@ Terima Kasih.
         background-color: rgba(108, 117, 125, 0.1);
         color: #6c757d;
     }
-
     .btn-light-success {
         background-color: rgba(40, 167, 69, 0.1);
         color: #28a745;
@@ -387,20 +385,22 @@ Terima Kasih.
     }
 
     .modal-confirmation-icon {
-    font-size: 4rem;
-    color: var(--bs-success);
-}
+        font-size: 4rem;
+        color: var(--bs-success);
+    }
 
-.approval-checklist {
-    border-left: 3px solid var(--bs-warning);
-    padding-left: 1rem;
-}
+    .approval-checklist {
+        border-left: 3px solid var(--bs-warning);
+        padding-left: 1rem;
+    }
 
-.form-check-input:checked {
-    background-color: var(--bs-success);
-    border-color: var(--bs-success);
-}
+    .form-check-input:checked {
+        background-color: var(--bs-success);
+        border-color: var(--bs-success);
+    }
 
-    
+    .modal {
+        z-index: 1060 !important;
+    }
 </style>
 @endsection

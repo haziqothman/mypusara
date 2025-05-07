@@ -1,170 +1,428 @@
 @extends('layouts.navigation')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10 mt-5">
-
-            <!-- Greeting -->
-            <div class="text-center mb-4">
-                <h2 class="fw-bold text-primary">Hi, {{ Auth::user()->name }}!</h2>
-                <p class="text-muted">Selamat datang ke Mypusara - Sistem Pengurusan Pusara Anda</p>
-            </div>
-
-            <!-- Dashboard Card -->
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-gradient bg-primary text-white rounded-top-4">
-                    <h4 class="mb-0">Dashboard</h4>
-                </div>
-
-                <div class="card-body p-5">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    <!-- Search Section -->
-                    <div class="text-center mb-5">
-                        <h4 class="fw-semibold">Carian Pusara</h4>
-                        <p class="text-muted">Cari dan temui lokasi pengebumian orang tersayang dengan mudah.</p>
-                    </div>
-
-                    <div class="d-flex justify-content-center">
-                        <form action="{{ route('search.pusara') }}" method="GET" class="w-75">
-                            <div class="input-group shadow-sm">
-                                <input type="text" 
-                                       class="form-control rounded-start-pill" 
-                                       placeholder="Contoh: A001, B100" 
-                                       name="search" 
-                                       required
-                                       value="{{ request('search') }}">
-                                <button class="btn btn-primary rounded-end-pill px-4" type="submit">
-                                    <i class="fas fa-search me-2"></i> Cari
-                                </button>
-                            </div>
-                            <div class="mt-3 text-center">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="status" id="allStatus" value="all" checked>
-                                    <label class="form-check-label" for="allStatus">Semua Status</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="status" id="bookedStatus" value="booked">
-                                    <label class="form-check-label" for="bookedStatus">Tempahan Sahaja</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="status" id="buriedStatus" value="buried">
-                                    <label class="form-check-label" for="buriedStatus">Telah Dikebumikan</label>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Search Results Section -->
-                    @if(isset($results))
-                    <div class="mt-5">
-                        <h5 class="fw-semibold mb-4">Hasil Carian</h5>
-                        
-                        @if($results->isEmpty())
-                            <div class="alert alert-info">
-                                Tiada rekod pusara ditemui.
-                            </div>
-                        @else
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>No. Pusara</th>
-                                            <th>Nama Si Mati</th>
-                                            <th>Status</th>
-                                            <th>Tarikh</th>
-                                            <th>Tindakan</th>
-                                        </tr>
-                                    </thead>
-                                    <div class="row gy-4">
-  <!-- Inside your card-body, after the search section -->
-@if(isset($bookings) && $bookings->count())
-<div class="mt-5">
-    <h5 class="fw-semibold mb-4">Senarai Tempahan Terkini</h5>
-    <div class="table-responsive">
-        <!-- In your search results table -->
-<table class="table table-hover">
-    <thead class="table-light">
-        <tr>
-            <th>No. Pusara</th>
-            <th>Nama Si Mati</th>
-            <th>No. MyKad</th>
-            <th>Status</th>
-            <th>Tarikh</th>
-            <th>Tindakan</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($results as $booking)
-        <tr>
-            <td>
-                @isset($booking->package)
-                    {{ $booking->package->pusaraNo }}
-                @else
-                    N/A
-                @endisset
-            </td>
-            <td>{{ $booking->nama_simati }}</td>
-            <td>{{ $booking->no_mykad_simati }}</td>
-            <td>
-                @if ($booking->status === 'confirmed')
-                    <span class="badge bg-success">Confirmed</span>
-                @elseif ($booking->status === 'pending')
-                    <span class="badge bg-warning">Pending</span>
-                @else
-                    <span class="badge bg-danger">Cancelled</span>
-                @endif
-            </td>
-            <td>{{ $booking->eventDate }}</td>
-            <td>
-                <a href="{{ route('bookings.show', $booking->id) }}" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-eye"></i> Lihat
-                </a>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+<div class="container-fluid px-4">
+    <!-- Welcome Header -->
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-5">
+        <div>
+            <h2 class="fw-bold text-gradient mb-1">Selamat Datang, {{ Auth::user()->name }}!</h2>
+            <p class="text-muted mb-0">Dashboard Pentadbir - Sistem Pengurusan Pusara</p>
+        </div>
+        <div class="avatar avatar-lg bg-primary text-white rounded-circle">
+            <i class="fas fa-user-shield"></i>
+        </div>
     </div>
-</div>
-@endif
-                                </table>
-                            </div>
-                        @endif
-                    </div>
-                    @endif
 
+    <!-- Stats Cards -->
+    <div class="row mb-4 g-4">
+        <!-- Total Bookings -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">
+                                <i class="fas fa-calendar-check me-2"></i> Jumlah Tempahan
+                            </h6>
+                            <h2 class="mb-0">{{ $stats['total_bookings'] }}</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-calendar text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-clock me-1"></i> {{ $stats['new_bookings_today'] }} hari ini
+                        </span>
+                    </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Pending Approvals -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">
+                                <i class="fas fa-clock me-2"></i> Menunggu Kelulusan
+                            </h6>
+                            <h2 class="mb-0">{{ $stats['pending_approvals'] }}</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-exclamation text-warning"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ route('admin.bookings.index') }}" class="btn btn-sm btn-warning btn-opacity-10">
+                            <i class="fas fa-eye me-1"></i> Lihat
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Graves -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">
+                                <i class="fas fa-tombstone me-2"></i> Pusara Tersedia
+                            </h6>
+                            <h2 class="mb-0">{{ $stats['available_graves'] }}</h2>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-check text-success"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 6px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ $stats['grave_utilization'] }}%" 
+                             aria-valuenow="{{ $stats['grave_utilization'] }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                    <small class="text-muted">{{ $stats['grave_utilization'] }}% digunakan</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Burials -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">
+                                <i class="fas fa-check-circle me-2"></i> Pengebumian Selesai
+                            </h6>
+                            <h2 class="mb-0">{{ $stats['completed_burials'] }}</h2>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-check-double text-info"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-calendar me-1"></i> Sehingga hari ini
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Recent Activity Row -->
+    <div class="row mb-4 g-4">
+        <!-- Bookings Chart -->
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line text-primary me-2"></i> 
+                        Trend Tempahan 6 Bulan Terkini
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="bookingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Distribution -->
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie text-primary me-2"></i> 
+                        Status Tempahan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="statusPieChart"></canvas>
+                    </div>
+                    <div class="text-center small mt-3">
+                        <span class="me-3">
+                            <i class="fas fa-circle text-success me-1"></i> Disahkan
+                        </span>
+                        <span class="me-3">
+                            <i class="fas fa-circle text-warning me-1"></i> Dalam Proses
+                        </span>
+                        <span>
+                            <i class="fas fa-circle text-danger me-1"></i> Dibatalkan
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings and Quick Actions -->
+    <div class="row g-4">
+        <!-- Recent Bookings -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history text-primary me-2"></i> 
+                            Tempahan Terkini
+                        </h5>
+                        <a href="{{ route('admin.bookings.index') }}" class="btn btn-sm btn-outline-primary">
+                            Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No. Pusara</th>
+                                    <th>Nama Si Mati</th>
+                                    <th>Tarikh</th>
+                                    <th>Status</th>
+                                    <th>Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($recentBookings as $booking)
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary">
+                                            {{ $booking->package->pusaraNo ?? 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $booking->nama_simati }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($booking->eventDate)->format('d/m/Y') }}</td>
+                                    <td>
+                                        @if($booking->status == 'confirmed')
+                                            <span class="badge bg-success bg-opacity-10 text-success">
+                                                <i class="fas fa-check-circle me-1"></i> Disahkan
+                                            </span>
+                                        @elseif($booking->status == 'pending')
+                                            <span class="badge bg-warning bg-opacity-10 text-warning">
+                                                <i class="fas fa-clock me-1"></i> Dalam Proses
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger bg-opacity-10 text-danger">
+                                                <i class="fas fa-times-circle me-1"></i> Dibatalkan
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('admin.bookings.view', $booking->id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <i class="fas fa-calendar-times fa-2x text-muted mb-3"></i>
+                                        <p class="text-muted">Tiada rekod tempahan terkini</p>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt text-primary me-2"></i> 
+                        Tindakan Pantas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="{{ route('admin.bookings.index') }}" 
+                           class="btn btn-primary btn-lg text-start">
+                            <i class="fas fa-calendar-plus me-2"></i> Urus Tempahan
+                        </a>
+                        
+                        <a href="{{ route('admin.create.package') }}" 
+                           class="btn btn-success btn-lg text-start">
+                            <i class="fas fa-tombstone me-2"></i> Tambah Pusara
+                        </a>
+                        
+                        <a href="{{ route('adminProfile.users.index') }}" 
+                           class="btn btn-warning btn-lg text-start">
+                            <i class="fas fa-users me-2"></i> Pengurusan Pengguna
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
 @endsection
 
 @section('styles')
 <style>
-    .rounded-4 {
-        border-radius: 1rem !important;
+    .text-gradient {
+        background: linear-gradient(90deg, #4e73df 0%, #224abe 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
     }
-    .rounded-top-4 {
-        border-top-left-radius: 1rem !important;
-        border-top-right-radius: 1rem !important;
+    
+    .avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
-    .bg-gradient {
-        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    
+    .avatar-lg {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
     }
-    .form-control:focus {
-        border-color: #86b7fe;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    
+    .chart-area {
+        position: relative;
+        height: 250px;
+        width: 100%;
     }
+    
+    .chart-pie {
+        position: relative;
+        height: 250px;
+        width: 100%;
+    }
+    
+    .bg-opacity-10 {
+        background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    }
+    
+    .btn-opacity-10 {
+        opacity: 0.9;
+        transition: opacity 0.2s;
+    }
+    
+    .btn-opacity-10:hover {
+        opacity: 1;
+    }
+    
     .table-hover tbody tr:hover {
-        background-color: rgba(13, 110, 253, 0.05);
+        background-color: rgba(78, 115, 223, 0.05);
+    }
+    
+    .rounded-3 {
+        border-radius: 0.75rem !important;
     }
 </style>
+@endsection
+
+@section('scripts')
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bookings Chart
+    var ctx = document.getElementById('bookingsChart').getContext('2d');
+    var bookingsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {!! json_encode($bookingStats['months']) !!},
+            datasets: [{
+                label: "Tempahan",
+                lineTension: 0.3,
+                backgroundColor: "rgba(78, 115, 223, 0.05)",
+                borderColor: "rgba(78, 115, 223, 1)",
+                pointRadius: 4,
+                pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointBorderColor: "#fff",
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointHoverBorderColor: "#fff",
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                data: {!! json_encode($bookingStats['counts']) !!},
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: "#fff",
+                    bodyColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    intersect: false,
+                    mode: 'index',
+                    caretPadding: 10,
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    ticks: {
+                        beginAtZero: true
+                    },
+                    grid: {
+                        color: "rgba(0, 0, 0, 0.05)",
+                    }
+                }
+            }
+        }
+    });
+    
+    // Status Pie Chart
+    var pieCtx = document.getElementById('statusPieChart').getContext('2d');
+    var statusPieChart = new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Disahkan", "Dalam Proses", "Dibatalkan"],
+            datasets: [{
+                data: [
+                    {{ $statusStats['confirmed'] }},
+                    {{ $statusStats['pending'] }},
+                    {{ $statusStats['cancelled'] }}
+                ],
+                backgroundColor: ['#1cc88a', '#f6c23e', '#e74a3b'],
+                hoverBackgroundColor: ['#17a673', '#dda20a', '#be2617'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            cutout: '70%',
+        }
+    });
+});
+</script>
 @endsection

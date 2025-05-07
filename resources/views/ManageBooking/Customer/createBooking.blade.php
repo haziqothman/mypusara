@@ -17,14 +17,9 @@
         </div>
     @endif
     @if(!$package->isAvailable())
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            Pusara ini tidak tersedia untuk tempahan.
-        </div>
         <a href="{{ route('customer.display.package') }}" class="btn btn-primary">
             <i class="fas fa-arrow-left me-2"></i> Kembali ke Senarai Pusara
         </a>
-        @return
     @endif
 
     {{-- Main content --}}
@@ -85,6 +80,16 @@
                                     <span class="input-group-text bg-white"><i class="fas fa-phone"></i></span>
                                     <input type="tel" id="contactNumber" name="contactNumber" class="form-control" 
                                            value="{{ old('contactNumber', $user->phone ?? '') }}" placeholder="+60123456789" required>
+                                </div>
+                            </div>
+
+                            <!-- Added Address Field -->
+                            <div class="mb-3">
+                                <label for="waris_address" class="form-label">Alamat Waris</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-home"></i></span>
+                                    <textarea id="waris_address" name="waris_address" class="form-control" 
+                                              placeholder="No rumah, Jalan, Bandar, Poskod, Negeri" required>{{ old('waris_address') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -213,7 +218,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    // Check if the package is available when page loads
+            // Check if the package is available when page loads
             const packageStatus = "{{ $package->isAvailable() ? 'available' : 'unavailable' }}";
             
             if(packageStatus === 'unavailable') {
@@ -223,27 +228,12 @@
                     return false;
                 });
             }
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            // Example of unavailable dates (replace with dynamic data from your backend)
-            const unavailableDates = ['2024-12-25', '2024-12-31', '2025-01-01'];
-
+            
             // Initialize Flatpickr for the date
             flatpickr("#eventDate", {
                 dateFormat: "Y-m-d",
-                disable: unavailableDates,
                 minDate: "today",
                 locale: "ms", // Malay localization
-                onChange: function(selectedDates, dateStr, instance) {
-                    if (unavailableDates.includes(dateStr)) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Tarikh Tidak Tersedia',
-                            text: 'Tarikh yang dipilih telah penuh. Sila pilih tarikh lain.',
-                        });
-                        instance.clear();
-                    }
-                }
             });
 
             // Initialize Flatpickr for the time
@@ -288,12 +278,12 @@
             border-bottom: none;
         }
         
-        .form-control, .form-select {
+        .form-control, .form-select, textarea {
             border-radius: 0.5rem;
             padding: 0.5rem 1rem;
         }
         
-        .form-control:focus, .form-select:focus {
+        .form-control:focus, .form-select:focus, textarea:focus {
             box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
             border-color: #4e73df;
         }
@@ -329,13 +319,17 @@
         }
         
         .was-validated .form-control:invalid, 
-        .was-validated .form-control:invalid:focus {
+        .was-validated .form-control:invalid:focus,
+        .was-validated textarea:invalid,
+        .was-validated textarea:invalid:focus {
             border-color: #e74a3b;
             box-shadow: 0 0 0 0.25rem rgba(231, 74, 59, 0.25);
         }
         
         .was-validated .form-control:valid, 
-        .was-validated .form-control:valid:focus {
+        .was-validated .form-control:valid:focus,
+        .was-validated textarea:valid,
+        .was-validated textarea:valid:focus {
             border-color: #1cc88a;
             box-shadow: 0 0 0 0.25rem rgba(28, 200, 138, 0.25);
         }

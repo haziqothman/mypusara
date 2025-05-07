@@ -74,6 +74,16 @@
                                                    class="form-control" placeholder="cth: 0123456789" required>
                                         </div>
                                     </div>
+
+                                     <div class="mb-3">
+                                        <label for="waris_address" class="form-label">Alamat Waris</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt"></i></span>
+                                            <input type="text" id="waris_address" name="waris_address" 
+                                                value="{{ old('waris_address', $booking->waris_address ?? '') }}" 
+                                                class="form-control" placeholder="Contoh: No. 10, Jalan Mawar, 12345 Shah Alam" required>
+                                        </div>
+                                    </div>
                                     
                                     <!-- Area -->
                                     <div class="col-12">
