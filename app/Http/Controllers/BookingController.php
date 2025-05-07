@@ -103,6 +103,7 @@ class BookingController extends Controller
             'no_mykad' => 'required|string|max:20',
             'customerEmail' => 'required|email|max:255',
             'contactNumber' => 'required|string|max:20',
+            'jantina_simati' => 'required|in:Lelaki,Perempuan',
             'area' => 'required|string|max:100',
             'nama_simati' => 'required|string|max:255',
             'no_mykad_simati' => 'required|string|max:20', // Required field
@@ -119,6 +120,7 @@ class BookingController extends Controller
             'no_mykad' => $validated['no_mykad'],
             'customerEmail' => $validated['customerEmail'],
             'contactNumber' => $validated['contactNumber'],
+            'jantina_simati' => $validated['jantina_simati'],
             'area' => $validated['area'],
             'nama_simati' => $validated['nama_simati'],
             'no_mykad_simati' => $validated['no_mykad_simati'],  // Ensure the field is included
@@ -209,6 +211,7 @@ class BookingController extends Controller
         $booking->contactNumber = $request->input('contactNumber');
         $booking->area = $request->input('area');
         $booking->no_mykad_simati = $request->input('no_mykad_simati');
+        $booking->jantina_simati = $request->input('jantina_simati');
         $booking->no_sijil_kematian = $request->input('no_sijil_kematian');
         $booking->waris_address = $request->input('waris_address');
         $booking->nama_simati = $request->input('nama_simati');

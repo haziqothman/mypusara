@@ -69,7 +69,7 @@
 </script>
 
 <!-- Load Google Maps API with your key -->
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&libraries=places" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAY3KxvzDDH7yQl1FHhGOU6NRgOl4XdchY&callback=initMap" async defer></script>
 
 <!-- Optional: Load Marker Clusterer for many markers -->
 <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>

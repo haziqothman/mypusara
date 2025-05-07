@@ -76,9 +76,28 @@
                                 <span class="detail-label">No Kad Pengenalan:</span>
                                 <span class="detail-value">{{ $booking->no_mykad_simati }}</span>
                             </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Jantina:</span>
+                                <span class="detail-value">
+                                    @if($booking->jantina_simati == 'Lelaki')
+                                        <i class="fas fa-mars text-primary me-1"></i> Lelaki
+                                    @else
+                                        <i class="fas fa-venus text-danger me-1"></i> Perempuan
+                                    @endif
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tarikh Meninggal:</span>
+                                <span class="detail-value">{{ $booking->eventDate }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Masa Meninggal:</span>
+                                <span class="detail-value">{{ $booking->eventTime }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
+                
 
                 <div class="divider my-4" style="height: 1px; background: rgba(0,0,0,0.1);"></div>
 
@@ -94,16 +113,8 @@
                                 <span class="detail-value">{{ $booking->package ? $booking->package->pusaraNo : 'N/A' }}</span>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-label">Lokasi:</span>
+                                <span class="detail-label">Lokasi Kematian:</span>
                                 <span class="detail-value">{{ $booking->eventLocation }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Tarikh:</span>
-                                <span class="detail-value">{{ $booking->eventDate }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Masa:</span>
-                                <span class="detail-value">{{ $booking->eventTime }}</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Status:</span>

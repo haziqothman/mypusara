@@ -70,7 +70,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-uppercase text-muted mb-2">
-                                <i class="fas fa-tombstone me-2"></i> Pusara Tersedia
+                                <i class="fas fa-tombstone me-2"></i> Bilangan Pusara
                             </h6>
                             <h2 class="mb-0">{{ $stats['available_graves'] }}</h2>
                         </div>
@@ -263,9 +263,78 @@
                            class="btn btn-warning btn-lg text-start">
                             <i class="fas fa-users me-2"></i> Pengurusan Pengguna
                         </a>
+                        
+                        <button type="button" class="btn btn-info btn-lg text-start" data-bs-toggle="modal" data-bs-target="#reportModal">
+                            <i class="fas fa-file-alt me-2"></i> Jana Laporan
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="reportModalLabel">Jana Laporan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.generate.report') }}" method="POST" target="_blank">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="report_type" class="form-label">Jenis Laporan</label>
+                        <select class="form-select" id="report_type" name="report_type" required>
+                            <option value="">Pilih Jenis Laporan</option>
+                            <option value="bookings">Laporan Tempahan</option>
+                            <option value="graves">Laporan Pusara</option>
+                            <option value="users">Laporan Pengguna</option>
+                            <option value="financial">Laporan Kewangan</option>
+                        </select>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Tarikh Mula</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">Tarikh Akhir</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="statusField" style="display:none;">
+                        <label for="status" class="form-label">Status Tempahan</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="all">Semua Status</option>
+                            <option value="confirmed">Disahkan Sahaja</option>
+                            <option value="pending">Dalam Proses Sahaja</option>
+                            <option value="cancelled">Dibatalkan Sahaja</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Format Laporan</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="format" id="formatPdf" value="pdf" checked>
+                            <label class="form-check-label" for="formatPdf">
+                                PDF <i class="far fa-file-pdf text-danger"></i>
+                            </label>
+                        </div>
+                    
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-download me-1"></i> Muat Turun
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -423,6 +492,35 @@ document.addEventListener('DOMContentLoaded', function() {
             cutout: '70%',
         }
     });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle report type changes
+    const reportType = document.getElementById('report_type');
+    const statusField = document.getElementById('statusField');
+    
+    reportType.addEventListener('change', function() {
+        if (this.value === 'bookings') {
+            statusField.style.display = 'block';
+        } else {
+            statusField.style.display = 'none';
+        }
+    });
+    
+    // Set default dates
+    const startDate = document.getElementById('start_date');
+    const endDate = document.getElementById('end_date');
+    
+    if (startDate && endDate) {
+        const today = new Date().toISOString().split('T')[0];
+        const firstDayOfMonth = new Date();
+        firstDayOfMonth.setDate(1);
+        const firstDayStr = firstDayOfMonth.toISOString().split('T')[0];
+        
+        startDate.value = firstDayStr;
+        endDate.value = today;
+    }
 });
 </script>
 @endsection

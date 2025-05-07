@@ -130,6 +130,18 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="jantina_simati" class="form-label">Jantina Si Mati</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-venus-mars"></i></span>
+                                    <select id="jantina_simati" name="jantina_simati" class="form-select" required>
+                                        <option value="" disabled selected>Pilih Jantina</option>
+                                        <option value="Lelaki" {{ old('jantina_simati') == 'Lelaki' ? 'selected' : '' }}>Lelaki</option>
+                                        <option value="Perempuan" {{ old('jantina_simati') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="eventLocation" class="form-label">Hospital Si Mati</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white"><i class="fas fa-hospital"></i></span>

@@ -12,6 +12,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\MCDMController;
 use App\Http\Controllers\AdminSelectionController;
+use App\Http\Controllers\MapController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -163,6 +164,11 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
                 return back()->with('success', 'Semua notifikasi telah ditandai sebagai dibaca');
             })->name('admin.notifications.markAllRead');
             });
+
+            // Generate Excel Reports
+
+            Route::post('/admin/generate-report', [HomeController::class, 'generateReport'])
+    ->name('admin.generate.report');
 });
 
   // Anonymous Dashboard Route
@@ -211,6 +217,7 @@ Route::get('/customer/pusara', function() {
     return view('customer.pusara-selection');
 })->name('customer.pusara.selection')->middleware(['auth', 'user-access:customer']);
 
+ Route::get('/map', [MapController::class, 'index']);
 
 Route::get('/verify-packages', function() {
     $problemPackages = Package::where('status', 'tersedia')

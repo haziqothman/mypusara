@@ -48,7 +48,7 @@
                 <li class="nav-item">
                      @if (Auth::check() && Auth::user()->type == 'admin')
                         <a class="nav-link" href="{{ route('admin.display.package') }}"> Tambah Pusara</a>
-                    @elseif (Auth::check() && Auth:: suser()->type === 'customer')
+                    @elseif (Auth::check() && Auth:: user()->type === 'customer')
                         <a class="nav-link" href="{{ route('customer.pusara.selection') }}"> Pusara</a>
                     @endif
                 </li>

@@ -227,15 +227,15 @@
           </div>
 
           
-          <div class="d-flex justify-content-between align-items-center mb-4">
+          <!-- <div class="d-flex justify-content-between align-items-center mb-4">
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="remember" id="remember">
               <label class="form-check-label" for="remember">Ingat Saya</label>
             </div>
             <a href="{{ route('password.request') }}" class="auth-link">Lupa Kata Laluan?</a>
-          </div>
+          </div> -->
           
-          <button type="submit" class="btn btn-auth w-100 mb-3">
+          <button type="submit" class="btn btn-auth w-100 mb-3 mt-3">
             <i class="fas fa-sign-in-alt me-2"></i> Log Masuk
           </button>
           

@@ -109,6 +109,17 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label for="jantina_simati" class="form-label">Jantina Si Mati</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-venus-mars"></i></span>
+                                            <select id="jantina_simati" name="jantina_simati" class="form-select" required>
+                                                <option value="Lelaki" {{ old('jantina_simati', $booking->jantina_simati) == 'Lelaki' ? 'selected' : '' }}>Lelaki</option>
+                                                <option value="Perempuan" {{ old('jantina_simati', $booking->jantina_simati) == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label for="no_sijil_kematian" class="form-label">No. Sijil Kematian</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white"><i class="as fa-award"></i></span>
@@ -139,7 +150,7 @@
                                     
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label for="eventDate" class="form-label">Tarikh Acara</label>
+                                            <label for="eventDate" class="form-label">Tarikh Meninggal</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="fas fa-calendar-day"></i></span>
                                                 <input type="text" id="eventDate" name="eventDate" 
@@ -149,7 +160,7 @@
                                         </div>
                                         
                                         <div class="col-md-6">
-                                            <label for="eventTime" class="form-label">Masa Acara</label>
+                                            <label for="eventTime" class="form-label">Masa Meninggal</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="fas fa-clock"></i></span>
                                                 <input type="time" id="eventTime" name="eventTime" 
@@ -159,7 +170,7 @@
                                         </div>
                                         
                                         <div class="col-12">
-                                            <label for="eventLocation" class="form-label">Lokasi Acara</label>
+                                            <label for="eventLocation" class="form-label">Lokasi Kematian</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="fas fa-map-marked-alt"></i></span>
                                                 <input type="text" id="eventLocation" name="eventLocation" 

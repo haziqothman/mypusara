@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use App\Exports\BookingsExport;
+use App\Exports\GravesExport;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Booking;
 use App\Models\Package; // Corrected the class name to 'Package' if this is the intended model
 use Carbon\Carbon; // Import the Carbon class for date manipulation
@@ -91,51 +95,158 @@ class HomeController extends Controller
     }
 
     
+    // Add these at the top of HomeController.php
+
+
+// Add this method to the HomeController class
     public function generateReport(Request $request)
     {
         $request->validate([
-            'report_type' => 'required|in:bookings,financial,inventory,maintenance',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'format' => 'required|in:pdf,excel,csv'
+            'report_type' => 'required|in:bookings,graves,users,financial',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'format' => 'required|in:pdf,excel,csv',
+            'status' => 'nullable|in:all,confirmed,pending,cancelled' // For booking reports
         ]);
-    
-        // Generate report based on type
+
+        $startDate = $request->start_date ? Carbon::parse($request->start_date) : null;
+        $endDate = $request->end_date ? Carbon::parse($request->end_date) : null;
+        
+        $filename = $this->getFilename($request->report_type, $startDate, $endDate);
+
         switch ($request->report_type) {
             case 'bookings':
-                $data = Booking::with(['user', 'package'])
-                         ->whereBetween('created_at', [$request->start_date, $request->end_date])
-                         ->get();
-                $view = 'reports.bookings';
-                $filename = 'bookings_report_'.now()->format('YmdHis');
+                $data = $this->getBookingData($request->status, $startDate, $endDate);
+                $view = 'admin.reports.bookings';
+                break;
+                
+            case 'graves':
+                $data = $this->getGraveData();
+                $view = 'admin.reports.graves';
+                break;
+                
+            case 'users':
+                $data = $this->getUserData();
+                $view = 'admin.reports.users';
                 break;
                 
             case 'financial':
-                $data = Payment::with(['booking.user', 'booking.package'])
-                         ->whereBetween('created_at', [$request->start_date, $request->end_date])
-                         ->get();
-                $view = 'reports.financial';
-                $filename = 'financial_report_'.now()->format('YmdHis');
+                $data = $this->getFinancialData($startDate, $endDate);
+                $view = 'admin.reports.financial';
                 break;
-                
-            // Add other report types as needed
         }
-    
-        // Return in requested format
+
         if ($request->format == 'pdf') {
-            $pdf = PDF::loadView($view, compact('data', 'request'));
+            $pdf = PDF::loadView($view, compact('data', 'startDate', 'endDate'));
             return $pdf->download($filename.'.pdf');
-        } elseif ($request->format == 'excel') {
-            return Excel::download(new ReportExport($data), $filename.'.xlsx');
         } else {
-            return Excel::download(new ReportExport($data), $filename.'.csv', \Maatwebsite\Excel\Excel::CSV);
+            $exportClass = $this->getExportClass($request->report_type);
+            $export = new $exportClass($data, $startDate, $endDate);
+            
+            $format = $request->format == 'excel' ? \Maatwebsite\Excel\Excel::XLSX : \Maatwebsite\Excel\Excel::CSV;
+            return Excel::download($export, $filename.'.'.$request->format, $format);
         }
     }
-    
-    // For showing a single booking
-    public function show($id)
+
+    private function getFilename($type, $startDate, $endDate)
     {
-        $booking = Booking::with('package')->findOrFail($id);
-        return view('bookings.show', compact('booking')); // Make sure to use correct view name
+        $prefix = [
+            'bookings' => 'Laporan_Tempahan',
+            'graves' => 'Laporan_Pusara',
+            'users' => 'Laporan_Pengguna',
+            'financial' => 'Laporan_Kewangan'
+        ][$type];
+        
+        $dateRange = $startDate ? '_'.$startDate->format('Ymd') : '';
+        $dateRange .= $endDate ? '_hingga_'.$endDate->format('Ymd') : '';
+        
+        return $prefix.$dateRange.'_'.now()->format('YmdHis');
+    }
+
+    private function getBookingData($status, $startDate, $endDate)
+    {
+        $query = Booking::with(['user', 'package'])
+                    ->when($status && $status != 'all', function($q) use ($status) {
+                        return $q->where('status', $status);
+                    })
+                    ->when($startDate, function($q) use ($startDate, $endDate) {
+                        return $q->whereBetween('created_at', [$startDate, $endDate]);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+                    
+        return [
+            'bookings' => $query,
+            'total' => $query->count(),
+            'confirmed' => $query->where('status', 'confirmed')->count(),
+            'pending' => $query->where('status', 'pending')->count(),
+            'cancelled' => $query->where('status', 'cancelled')->count()
+        ];
+    }
+
+    private function getGraveData()
+    {
+        $graves = Package::withCount(['bookings as total_bookings' => function($q) {
+                $q->where('status', 'confirmed');
+            }])
+            ->orderBy('section')
+            ->orderBy('pusaraNo')
+            ->get();
+            
+        $sectionStats = [
+            'section_A' => $graves->where('section', 'section_A'),
+            'section_B' => $graves->where('section', 'section_B'),
+            'section_C' => $graves->where('section', 'section_C')
+        ];
+        
+        return [
+            'graves' => $graves,
+            'sectionStats' => $sectionStats,
+            'totalGraves' => $graves->count(),
+            'availableGraves' => $graves->where('status', 'tersedia')->count(),
+            'maintenanceGraves' => $graves->where('status', 'dalam_penyelanggaraan')->count()
+        ];
+    }
+
+    private function getUserData()
+    {
+        $users = User::withCount(['bookings as total_bookings'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+                
+        return [
+            'users' => $users,
+            'totalUsers' => $users->count(),
+            'activeUsers' => $users->where('total_bookings', '>', 0)->count(),
+            'newUsers' => $users->where('created_at', '>=', now()->subMonth())->count()
+        ];
+    }
+
+    private function getFinancialData($startDate, $endDate)
+    {
+        // This would depend on your payment system implementation
+        // Placeholder for financial data
+        return [
+            'totalRevenue' => 0,
+            'pendingPayments' => 0,
+            'completedPayments' => 0,
+            'transactions' => []
+        ];
+    }
+
+    private function getExportClass($type)
+    {
+        return [
+            'bookings' => BookingsExport::class,
+            'graves' => GravesExport::class,
+            'users' => UsersExport::class,
+            'financial' => FinancialExport::class
+        ][$type];
+    }
+
+    public function exportBookings()
+    {
+        $bookings = Booking::all();
+        return Excel::download(new BookingsExport($bookings), 'bookings.xlsx');
     }
 }
