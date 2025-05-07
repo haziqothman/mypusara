@@ -13,14 +13,14 @@
                 </div>
                 <div>
                     <h2 class="mb-0">{{ $user->name }}</h2>
-                    <p class="text-muted mb-0">Member since {{ $user->created_at->format('F Y') }}</p>
+                    <p class="text-muted mb-0">Ahli sejak {{ $user->created_at->format('F Y') }}</p>
                 </div>
             </div>
 
             <!-- Profile Card -->
             <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
                 <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i> Profile Information</h5>
+                    <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i> Maklumat Profil anda</h5>
                 </div>
                 
                 <div class="card-body p-0">
@@ -30,7 +30,7 @@
                                 <!-- Basic Info -->
                                 <tr class="border-bottom">
                                     <th class="ps-4 py-3" style="width: 35%;">
-                                        <i class="fas fa-envelope me-2 text-primary"></i> Email
+                                        <i class="fas fa-envelope me-2 text-primary"></i> E-mel
                                     </th>
                                     <td class="py-3">{{ $user->email }}</td>
                                 </tr>
@@ -38,7 +38,7 @@
                                 @if ($user->phone)
                                 <tr class="border-bottom">
                                     <th class="ps-4 py-3">
-                                        <i class="fas fa-phone me-2 text-primary"></i> Phone
+                                        <i class="fas fa-phone me-2 text-primary"></i> Nombor Telefon
                                     </th>
                                     <td class="py-3">{{ $user->phone }}</td>
                                 </tr>
@@ -48,7 +48,7 @@
                                 @if ($user->address || $user->postcode || $user->city)
                                 <tr class="border-bottom">
                                     <th class="ps-4 py-3">
-                                        <i class="fas fa-map-marker-alt me-2 text-primary"></i> Address
+                                        <i class="fas fa-map-marker-alt me-2 text-primary"></i> Alamat
                                     </th>
                                     <td class="py-3">
                                         @if ($user->address)
@@ -63,21 +63,11 @@
                                 </tr>
                                 @endif
                                 
-                                <!-- Company Info -->
-                                @if ($user->company)
-                                <tr class="border-bottom">
-                                    <th class="ps-4 py-3">
-                                        <i class="fas fa-building me-2 text-primary"></i> Company
-                                    </th>
-                                    <td class="py-3">{{ $user->company }}</td>
-                                </tr>
-                                @endif
-                                
                                 <!-- Identification -->
                                 @if ($user->identification_card)
                                 <tr class="border-bottom">
                                     <th class="ps-4 py-3">
-                                        <i class="fas fa-id-card me-2 text-primary"></i> Identification
+                                        <i class="fas fa-id-card me-2 text-primary"></i> Kad Pengenalan
                                     </th>
                                     <td class="py-3">{{ $user->identification_card }}</td>
                                 </tr>
@@ -86,7 +76,7 @@
                                 <!-- Membership -->
                                 <tr>
                                     <th class="ps-4 py-3">
-                                        <i class="fas fa-calendar-alt me-2 text-primary"></i> Member Since
+                                        <i class="fas fa-calendar-alt me-2 text-primary"></i> Tarikh Daftar
                                     </th>
                                     <td class="py-3">{{ $user->created_at->format('d F Y') }}</td>
                                 </tr>

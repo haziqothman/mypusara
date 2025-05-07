@@ -85,6 +85,37 @@ class MCDMController extends Controller
         return $scoredPackages->sortByDesc('score')->values();
     }
 
+    private function applyMcdmAlgorithm($packages, $criteria)
+{
+    $weights = $this->calculateMcdmWeights($criteria);
+
+    $scoredPackages = $packages->map(function ($package) use ($weights, $criteria) {
+        $score = 0;
+        
+        // Using your existing field names from the package table
+        $score += $this->calculateProximityScore($package->proximity_rating, $criteria['proximity']) * $weights['proximity'];
+        $score += $this->calculateAccessibilityScore($package->accessibility_rating, $criteria['accessibility']) * $weights['accessibility'];
+        $score += $this->calculatePathwayScore($package->pathway_condition, $criteria['pathway_condition']) * $weights['pathway'];
+        $score += $this->calculateSoilScore($package->soil_condition, $criteria['soil_condition']) * $weights['soil'];
+        $score += $this->calculateDrainageScore($package->drainage_rating, $criteria['drainage']) * $weights['drainage'];
+        $score += $this->calculateShadeScore($package->shade_coverage, $criteria['shade']) * $weights['shade'];
+        
+        return [
+            'package' => $package,
+            'score' => round($score, 2),
+            // Keep your existing score details structure
+            'proximity_score' => $this->calculateProximityScore($package->proximity_rating, $criteria['proximity']),
+            'accessibility_score' => $this->calculateAccessibilityScore($package->accessibility_rating, $criteria['accessibility']),
+            'pathway_score' => $this->calculatePathwayScore($package->pathway_condition, $criteria['pathway_condition']),
+            'soil_score' => $this->calculateSoilScore($package->soil_condition, $criteria['soil_condition']),
+            'drainage_score' => $this->calculateDrainageScore($package->drainage_rating, $criteria['drainage']),
+            'shade_score' => $this->calculateShadeScore($package->shade_coverage, $criteria['shade'])
+        ];
+    });
+
+    return $scoredPackages->sortByDesc('score')->values();
+}
+
     private function calculateWeights($criteria)
     {
         // Base weights (can be adjusted)
@@ -183,21 +214,93 @@ class MCDMController extends Controller
         return $scores[$userPreference][$packageCoverage] ?? 0.5;
     }
 
+
     public function processMcdm(Request $request)
-{
-    // ... validation code ...
-    
-    $packages = Package::where('status', 'tersedia')->get();
-    
-    // Debug: dump package count and first package
-    dd([
-        'package_count' => $packages->count(),
-        'first_package' => $packages->first(),
-        'criteria' => $validated
-    ]);
-    
-    $rankedPackages = $this->applyMcdmAlgorithm($packages, $validated);
-    
-    // ... rest of the code ...
-}
+    {
+        $validated = $request->validate([
+            // ... your existing validation rules ...
+        ]);
+
+        // Get only truly available packages
+        $packages = Package::where('status', 'tersedia')
+            ->whereDoesntHave('activeBookings')
+            ->with('bookings') // Optional: eager load if needed
+            ->get();
+
+        // Debug: Check what's being returned
+        logger()->info('MCDM Available Packages', [
+            'count' => $packages->count(),
+            'package_ids' => $packages->pluck('id'),
+            'first_package' => $packages->first() ? $packages->first()->toArray() : null
+        ]);
+
+        $rankedPackages = $this->applyMcdmAlgorithm($packages, $validated);
+
+        return view('MCDM.results', [
+            'packages' => $rankedPackages,
+            'criteria' => $validated
+        ]);
+    }
+    // Temporary debug method - add this to your controller
+    public function debugBookedPackages()
+    {
+        $bookedPackageIds = DB::table('bookings')
+            ->where('status', '!=', 'cancelled')
+            ->pluck('packageId')
+            ->toArray();
+
+        $availablePackages = Package::where('status', 'tersedia')
+            ->whereDoesntHave('bookings', function($query) {
+                $query->where('status', '!=', 'cancelled');
+            })
+            ->get();
+
+        return response()->json([
+            'booked_package_ids' => $bookedPackageIds,
+            'available_packages_count' => $availablePackages->count(),
+            'available_packages' => $availablePackages->pluck('id')
+        ]);
+    }
+
+    // Add these helper methods to your controller
+
+/**
+ * Verify package availability status
+ */
+    public function verifyPackageAvailability($packageId)
+    {
+        $package = Package::with(['bookings' => function($q) {
+            $q->where('status', '!=', 'cancelled');
+        }])->find($packageId);
+
+        return response()->json([
+            'package_id' => $packageId,
+            'status' => $package->status,
+            'is_available' => $package->status === 'tersedia' && $package->bookings->isEmpty(),
+            'active_bookings' => $package->bookings
+        ]);
+    }
+
+    /**
+     * List all unavailable packages
+     */
+    public function listUnavailablePackages()
+    {
+        $unavailable = Package::where('status', '!=', 'tersedia')
+            ->orWhereHas('bookings', function($q) {
+                $q->where('status', '!=', 'cancelled');
+            })
+            ->get();
+
+        return response()->json([
+            'unavailable_packages' => $unavailable->map(function($pkg) {
+                return [
+                    'id' => $pkg->id,
+                    'pusaraNo' => $pkg->pusaraNo,
+                    'status' => $pkg->status,
+                    'bookings' => $pkg->bookings->where('status', '!=', 'cancelled')
+                ];
+            })
+        ]);
+    }
 }

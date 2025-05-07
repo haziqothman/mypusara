@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>myPusara Landing Page</title>
+  <link rel="icon" href="{{ asset('images/pusara.png') }}" type="image/png">
+  <title>MyPusara</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
@@ -77,15 +78,21 @@
       text-align: center;
     }
     .cta-btn {
-      background: white;
-      color: #224abe;
-      font-weight: bold;
-      padding: 12px 30px;
-      border-radius: 50px;
-      font-size: 1.1rem;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
+    background: white;
+    color: #224abe;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* optional: ensures spacing between icon and text */
+    text-decoration: none;
+  }
+
     .cta-btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
@@ -121,17 +128,24 @@
 
 <!-- Main Center Content -->
 <div class="center-container">
-  <h1 class="text-primary mb-3 fw-bold">Selamat Datang ke myPusara</h1>
-  <p class="lead mb-4">Platform digital untuk pengurusan pusara yang mudah dan efisien</p>
-  <div class="search-container mb-5">
-    <form action="{{ route('search.pusara') }}" method="GET">
-      <div class="input-group shadow-sm">
-        <input type="text" class="form-control form-control-lg" placeholder="Carian Pusara..." name="search" required>
-        <button class="btn btn-primary btn-lg" type="submit"><i class="fas fa-search"></i> Carian</button>
-      </div>
+  <div class="search-container">
+    <form action="{{ route('search.bookings') }}" method="GET" class="w-100">
+        <div class="input-group shadow-sm">
+            <input type="text" class="form-control form-control-lg" 
+                   placeholder="Carian Pusara (Nama Si Mati/No Sijil Kematian/No Pusara)..." 
+                   name="search" required>
+            <button class="btn btn-primary btn-lg" type="submit">
+                <i class="fas fa-search"></i> Carian
+            </button>
+        </div>
+        <small class="text-muted mt-2 d-block">
+            <i class="fas fa-info-circle"></i> Hanya maklumat pusara yang telah dikebumikan sahaja akan dipaparkan
+        </small>
     </form>
   </div>
 </div>
+
+
 
 <!-- Features Section -->
 <section class="features-section">

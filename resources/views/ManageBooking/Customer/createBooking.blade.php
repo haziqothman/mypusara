@@ -193,7 +193,7 @@
 
                 {{-- Form actions --}}
                 <div class="d-flex justify-content-between mt-5">
-                    <a href="{{ route('customer.display.package') }}" 
+                    <a href="{{ route('home') }}" 
                        class="btn btn-outline-danger px-4 py-2"
                        onclick="return confirm('Adakah anda pasti ingin membatalkan tempahan ini?')">
                         <i class="fas fa-times me-2"></i> Batalkan

@@ -101,6 +101,8 @@ class CatalogueController extends Controller
             'section' => ['required', 'in:section_A,section_B,section_C'],
             'packageDesc' => ['required', 'string'],
             'packageImage' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             // MCDM fields
             'proximity_rating' => 'required|in:high,medium,low',
             'accessibility_rating' => 'required|in:excellent,good,poor',

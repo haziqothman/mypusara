@@ -7,7 +7,7 @@
             @if(auth()->user()->type == 'admin')
                 <div class="d-flex justify-content-end mb-4">
                     <a href="{{ route('adminProfile.users') }}" class="btn btn-primary">
-                        <i class="fas fa-users-cog me-2"></i> Manage Users
+                        <i class="fas fa-users-cog me-2"></i> Urus Pengguna
                     </a>
                 </div>
             @endif
@@ -22,7 +22,7 @@
                         </div>
                         <div>
                             <h3 class="mb-0">{{ $user->name }}</h3>
-                            <p class="mb-0 opacity-75">{{ ucfirst($user->type) }} Account</p>
+                            <p class="mb-0 opacity-75">{{ ucfirst($user->type) }} Akaun</p>
                         </div>
                     </div>
                 </div>
@@ -33,19 +33,19 @@
                         <!-- Main Profile Info -->
                         <div class="col-md-6">
                             <div class="profile-info-item mb-4">
-                                <h6 class="text-muted mb-2"><i class="fas fa-envelope me-2"></i> Email</h6>
+                                <h6 class="text-muted mb-2"><i class="fas fa-envelope me-2"></i> E-mel</h6>
                                 <p class="mb-0">{{ $user->email }}</p>
                             </div>
 
                             @if($user->phone)
                             <div class="profile-info-item mb-4">
-                                <h6 class="text-muted mb-2"><i class="fas fa-phone me-2"></i> Phone</h6>
+                                <h6 class="text-muted mb-2"><i class="fas fa-phone me-2"></i> No Telefon</h6>
                                 <p class="mb-0">{{ $user->phone }}</p>
                             </div>
                             @endif
 
                             <div class="profile-info-item mb-4">
-                                <h6 class="text-muted mb-2"><i class="fas fa-calendar-alt me-2"></i> Member Since</h6>
+                                <h6 class="text-muted mb-2"><i class="fas fa-calendar-alt me-2"></i> Ahli Sejak</h6>
                                 <p class="mb-0">{{ $user->created_at->format('F d, Y') }}</p>
                             </div>
                         </div>
@@ -54,7 +54,7 @@
                         <div class="col-md-6">
                             @if($user->address || $user->postcode || $user->city)
                             <div class="profile-info-item mb-4">
-                                <h6 class="text-muted mb-2"><i class="fas fa-map-marker-alt me-2"></i> Address</h6>
+                                <h6 class="text-muted mb-2"><i class="fas fa-map-marker-alt me-2"></i> Alamat</h6>
                                 <p class="mb-0">
                                     {{ $user->address }}<br>
                                     {{ $user->postcode }} {{ $user->city }}
@@ -62,16 +62,9 @@
                             </div>
                             @endif
 
-                            @if($user->company)
-                            <div class="profile-info-item mb-4">
-                                <h6 class="text-muted mb-2"><i class="fas fa-building me-2"></i> Company</h6>
-                                <p class="mb-0">{{ $user->company }}</p>
-                            </div>
-                            @endif
-
                             @if($user->identification_card)
                             <div class="profile-info-item mb-4">
-                                <h6 class="text-muted mb-2"><i class="fas fa-id-card me-2"></i> Identification</h6>
+                                <h6 class="text-muted mb-2"><i class="fas fa-id-card me-2"></i> Kad Pengenalan</h6>
                                 <p class="mb-0">{{ $user->identification_card }}</p>
                             </div>
                             @endif
@@ -81,10 +74,10 @@
                     <!-- Action Buttons -->
                     <div class="d-flex justify-content-center gap-3 mt-4 pt-3 border-top">
                         <a href="{{ route('adminProfile.edit') }}" class="btn btn-primary px-4">
-                            <i class="fas fa-user-edit me-2"></i> Edit Profile
+                            <i class="fas fa-user-edit me-2"></i> Kemaskini Profil
                         </a>
                         <a href="{{ auth()->user()->type == 'admin' ? route('admin.home') : route('home') }}" class="btn btn-outline-secondary px-4">
-                            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            <i class="fas fa-arrow-left me-2"></i>Kembali ke Papan Pemuka
                         </a>
                     </div>
                 </div>

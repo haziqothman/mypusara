@@ -67,6 +67,18 @@
                 
                 <div class="card-body">
                     @foreach($packages as $index => $result)
+                    @php
+                        $isAvailable = $result['package']->isAvailable();
+                        $errorMessage = '';
+                        
+                        if (!$isAvailable) {
+                            if ($result['package']->status !== 'tersedia') {
+                                $errorMessage = 'Pusara ini tidak tersedia untuk tempahan (Status: '.$result['package']->status.')';
+                            } else {
+                                $errorMessage = 'Pusara ini telah ditempah oleh waris lain';
+                            }
+                        }
+                    @endphp
                     <div class="package-card mb-4 p-3 border rounded {{ $index === 0 ? 'border-success border-2' : '' }}">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
@@ -77,6 +89,9 @@
                                         <i class="fas fa-trophy me-1"></i> Pilihan Terbaik
                                     </span>
                                     @endif
+                                    <span class="badge bg-primary ms-2">
+                                        <i class="fas fa-check-circle me-1"></i> Tersedia
+                                    </span>
                                 </h4>
                                 <p class="text-muted mb-2">
                                     <i class="fas fa-map-marker-alt me-2"></i>
@@ -122,9 +137,19 @@
                         
                         <div class="d-flex justify-content-between mt-3">
                            
-                            <a href="{{ route('customer.create.booking', $result['package']->id) }}" class="btn btn-sm btn-success">
+                        @if($isAvailable)
+                            <a href="{{ route('customer.create.booking', $result['package']->id) }}" 
+                            class="btn btn-sm btn-success">
                                 <i class="fas fa-calendar-check me-1"></i> Tempah Sekarang
                             </a>
+                        @else
+                            <button class="btn btn-sm btn-secondary" disabled>
+                                <i class="fas fa-times-circle me-1"></i> Tidak Boleh Tempah
+                            </button>
+                            <small class="text-danger d-block mt-1">
+                                <i class="fas fa-exclamation-triangle me-1"></i> {{ $errorMessage }}
+                            </small>
+                        @endif
                         </div>
                     </div>
                     @endforeach

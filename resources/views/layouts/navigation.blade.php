@@ -27,8 +27,8 @@
     <nav class="navbar navbar-expand-lg navbar-light"
         style="height: 80px; background-color:rgb(255, 255, 255); box-shadow: 0px 7px 10px rgb(241, 241, 241);">
         <!-- Updated logo with <a href="#"> -->
-        <a class="navbar-brand ms-4" href="{{ Auth::user()->type == 'admin' ? route('admin.home') : (Auth::user()->type == 'customer' ? route('home') : route('guest.home')) }}">
-            <a href="#">
+        <a class="navbar-brand ms-4" href="{{ Auth::check() ? (Auth::user()->type == 'admin' ? route('admin.home') : (Auth::user()->type == 'customer' ? route('home') : route('landing'))) : route('landing') }}">
+            <a href="/">
                 <img src="{{ asset('avatars/1734019274.png') }}" alt="Logo" width="80">
             </a>
         </a>
@@ -41,22 +41,21 @@
                             <a class="nav-link" href="{{ route('admin.home') }}"> Utama</a>
                         @elseif (Auth::check() && Auth::user()->type === 'customer')
                             <a class="nav-link" href="{{ route('home') }}"> Utama</a>
-                        @else
-                            <a class="nav-link" href="{{ url('/') }}">Utama</a>
+
                         @endif
                     </li>
                 </ul>
                 <li class="nav-item">
-                    @if (Auth::user()->type == 'admin')
+                     @if (Auth::check() && Auth::user()->type == 'admin')
                         <a class="nav-link" href="{{ route('admin.display.package') }}"> Tambah Pusara</a>
-                    @elseif (Auth::user()->type == 'customer')
+                    @elseif (Auth::check() && Auth:: suser()->type === 'customer')
                         <a class="nav-link" href="{{ route('customer.pusara.selection') }}"> Pusara</a>
                     @endif
                 </li>
                 <li class="nav-item">
-                    @if (Auth::user()->type == 'admin')
+                     @if (Auth::check() && Auth::user()->type === 'admin')
                         <a class="nav-link" href="{{ route('admin.bookings.index')}}">Tempahan Waris</a>
-                    @elseif (Auth::user()->type == 'customer')
+                     @elseif (Auth::check() && Auth::user()->type === 'customer')
                         <a class="nav-link" href="{{ route('ManageBooking.Customer.dashboardBooking') }}">Tempahan Anda</a>
                     @endif
                 </li>
@@ -65,13 +64,16 @@
         </div>
 
         <a id="navbarDropdown" class="nav-link dropdown-toggle col-1" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-            {{ Auth::user()->name }}
+            @if(Auth::check())
+                {{ Auth::user()->name }}
+            @endif
+
         </a>
         <div class="dropdown-menu dropdown-menu-end col-1" aria-labelledby="navbarDropdown">
-            @if (Auth::user()->type === 'admin')
-                <a href="{{ route('adminProfile.show') }}" class="dropdown-item">My Profile</a>
-            @elseif (Auth::user()->type === 'customer')
-                <a href="{{ route('customerProfile.show') }}" class="dropdown-item"> MyProfile</a>
+             @if (Auth::check() && Auth::user()->type === 'admin')
+                <a href="{{ route('adminProfile.show') }}" class="dropdown-item"> Profile</a>
+            @elseif (Auth::check() && Auth::user()->type === 'customer')
+                <a href="{{ route('customerProfile.show') }}" class="dropdown-item"> Profile</a>
             @endif
             <a class="dropdown-item" href="{{ route('logout') }}"
                 onclick="event.preventDefault();

@@ -167,7 +167,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
 
   // Anonymous Dashboard Route
   Route::get('/', function () {
-    return view('landing');
+    return view('public.landing');
 })->name('landing');
 
 
@@ -188,10 +188,8 @@ Route::get('/admin/home', [HomeController::class, 'adminHome'])->name('admin.hom
 // For showing single booking
 Route::get('/bookings/{id}', [HomeController::class, 'show'])->name('bookings.show');
 
-// Public routes
-Route::get('/', [PublicController::class, 'landing'])->name('landing');
-Route::get('/search-pusara', [PublicController::class, 'search'])->name('search.pusara');
-Route::get('/pusara/{id}', [PublicController::class, 'show'])->name('pusara.show');
+
+Route::get('/search/bookings', [PublicController::class, 'searchBookings'])->name('search.bookings');
 
 // Temporary debug route - Add this to routes/web.php
 Route::get('/debug-muhammad-ali', function() {
@@ -212,3 +210,31 @@ Route::middleware(['auth', 'user-access:customer'])->group(function () {
 Route::get('/customer/pusara', function() {
     return view('customer.pusara-selection');
 })->name('customer.pusara.selection')->middleware(['auth', 'user-access:customer']);
+
+
+Route::get('/verify-packages', function() {
+    $problemPackages = Package::where('status', 'tersedia')
+        ->whereHas('bookings', function($q) {
+            $q->whereNotIn('status', ['cancelled', 'rejected']);
+        })
+        ->with(['bookings' => function($q) {
+            $q->whereNotIn('status', ['cancelled', 'rejected']);
+        }])
+        ->get();
+
+    return response()->json([
+        'booked_but_marked_available' => $problemPackages->map(function($pkg) {
+            return [
+                'id' => $pkg->id,
+                'pusaraNo' => $pkg->pusaraNo,
+                'active_bookings' => $pkg->bookings->map(function($booking) {
+                    return [
+                        'id' => $booking->id,
+                        'status' => $booking->status,
+                        'customer' => $booking->customerName
+                    ];
+                })
+            ];
+        })
+    ]);
+});

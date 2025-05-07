@@ -21,31 +21,39 @@ class Booking extends Model
         'notes', 'eventDate', 'eventTime', 'eventLocation', 'document_path', 'user_id', 'packageId', 'status'
     ];
     
-    
+    public function package()
+    {
+        return $this->belongsTo(Package::class, 'packageId'); // 'packageId' is your foreign key
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id'); // Assuming 'user_id' is the foreign key
     }
 
-    public function package()
-{
-    return $this->belongsTo(Package::class, 'packageId');
-}
-
-public function up()
-{
-    Schema::table('bookings', function (Blueprint $table) {
-        $table->index('nama_simati');
-        $table->index('no_mykad_simati');
-        $table->index('status');
-    });
+    protected $casts = [
+        'eventDate' => 'datetime',
+    ];
     
-    Schema::table('packages', function (Blueprint $table) {
-        $table->index('pusaraNo');
-        $table->index('status');
-    });
-}
+    
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'packageId');
+    }
+
+    public function up()
+    {
+        Schema::table('bookings', function (Blueprint $table) {
+            $table->index('nama_simati');
+            $table->index('no_mykad_simati');
+            $table->index('status');
+        });
+        
+        Schema::table('packages', function (Blueprint $table) {
+            $table->index('pusaraNo');
+            $table->index('status');
+        });
+    }
 
 
 }

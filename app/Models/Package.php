@@ -31,17 +31,32 @@ class Package extends Model
         'longitude' => 'float',
     ];
 
+    protected $appends = ['coordinates'];
+
+
+    public function getCoordinatesAttribute()
+    {
+        return [
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude
+        ];
+    }
+
     public function bookings()
     {
         return $this->hasMany(Booking::class, 'packageId');
     }
 
+
+    public function activeBookings()
+    {
+        return $this->hasMany(Booking::class, 'packageId')
+            ->whereNotIn('status', ['cancelled', 'rejected']);
+    }
+
     public function isAvailable()
     {
-        return $this->status === 'tersedia' && 
-            !$this->bookings()
-                    ->whereIn('status', ['pending', 'confirmed'])
-                    ->exists();
+        return $this->status === 'tersedia' && !$this->activeBookings()->exists();
     }
 
     public function isBooked()
