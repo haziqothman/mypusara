@@ -86,6 +86,10 @@
     @if($package->count())
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         @foreach ($package as $item)
+            @php
+                 $hasActiveBookings = $item->bookings->where('status', '!=', 'cancelled')->count() > 0;
+                 $bookingStatus = $hasActiveBookings ? $item->bookings->firstWhere('status', '!=', 'cancelled')->status : null;
+            @endphp
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 overflow-hidden hover-lift">
                     {{-- Grave Header --}}
@@ -95,14 +99,42 @@
                                 <i class="fas fa-monument me-2"></i>Pusara {{ $item->pusaraNo }}
                             </h5>
                             <span class="badge bg-{{ 
-                                $item->status == 'tersedia' ? 'success' : 
-                                ($item->status == 'tidak_tersedia' ? 'danger' : 'warning') 
-                            }} rounded-pill shadow-sm">
-                                {{ ucfirst(str_replace('_', ' ', $item->status)) }}
+                                $bookingStatus == 'confirmed' ? 'danger' : 
+                                ($bookingStatus == 'pending' ? 'warning' : 
+                                ($item->status == 'tersedia' ? 'success' : 'secondary'))
+                            }} rounded-pill shadow-sm" 
+                            @if($hasActiveBookings)
+                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                title="Tempahan oleh: {{ $item->bookings->where('status', '!=', 'cancelled')->pluck('warisName')->implode(', ') }}"
+                            @endif>
+                                @if($bookingStatus == 'confirmed')
+                                    <i class="fas fa-check-circle me-1"></i> Disahkan
+                                @elseif($bookingStatus == 'pending')
+                                    <i class="fas fa-clock me-1"></i> Dalam Proses
+                                @else
+                                    {{ ucfirst(str_replace('_', ' ', $item->status)) }}
+                                @endif
                             </span>
                         </div>
-                        <div class="position-absolute bottom-0 start-0 end-0" style="height: 4px; background: rgba(255,255,255,0.2);"></div>
                     </div>
+
+                    {{-- Booking Status --}}
+                    {{-- Booking Warning --}}
+                    @if($hasActiveBookings)
+                    <div class="alert alert-warning alert-dismissible fade show m-3 mb-0 py-2" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <div>
+                                <strong>Pusara ini telah ditempah!</strong>
+                                @foreach($item->bookings as $booking)
+                                    Waris: {{ $booking->warisName }} (No. Tel: {{ $booking->warisPhone }})
+                                    @if(!$loop->last) | @endif
+                                @endforeach
+                            </div>
+                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    @endif
                     
                     {{-- Grave Details --}}
                     <div class="card-body">
@@ -165,15 +197,28 @@
                     {{-- Action Buttons --}}
                     <div class="card-footer bg-transparent border-top-0 pt-0 pb-3 px-3">
                         <div class="d-flex justify-content-between gap-2">
-                            <a href="{{ url('admin/package/' . $item->id . '/edit') }}" 
+                            <a href="{{ route('admin.edit.package', $item->id) }}" 
                                class="btn btn-sm btn-outline-primary flex-grow-1 rounded-pill">
                                 <i class="fas fa-edit me-1"></i> Sunting
                             </a>
-                            <button class="btn btn-sm btn-outline-danger flex-grow-1 rounded-pill" 
-                                    data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                                    onclick="populateModal({{ json_encode($item) }})">
-                                <i class="fas fa-trash-alt me-1"></i> Padam
-                            </button>
+                            
+                            @if($hasActiveBookings)
+                                <button class="btn btn-sm btn-outline-secondary flex-grow-1 rounded-pill" disabled>
+                                    <i class="fas fa-trash-alt me-1"></i> Padam (Telah Ditempah)
+                                </button>
+                            @else
+                                <button class="btn btn-sm btn-outline-danger flex-grow-1 rounded-pill" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteModal"
+                                        onclick="populateModal({{ json_encode([
+                                            'id' => $item->id,
+                                            'pusaraNo' => $item->pusaraNo,
+                                            'section' => $item->section,
+                                            'bookings' => []
+                                        ]) }})">
+                                    <i class="fas fa-trash-alt me-1"></i> Padam
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -214,14 +259,14 @@
                 @endif
 
                 {{-- Pagination Elements --}}
-                @foreach ($packages->links()->elements[0] as $page => $url)
-                    <li class="page-item {{ $packages->currentPage() == $page ? 'active' : '' }}">
+                @foreach ($package->links()->elements[0] as $page => $url)
+                    <li class="page-item {{ $package->currentPage() == $page ? 'active' : '' }}">
                         <a class="page-link" href="{{ $url }}">{{ $page }}</a>
                     </li>
                 @endforeach
 
                 {{-- Next Page Link --}}
-                @if ($packages->hasMorePages())
+                @if ($package->hasMorePages())
                     <li class="page-item">
                         <a class="page-link rounded-end-pill" href="{{ $package->nextPageUrl() }}" aria-label="Next">
                             <i class="fas fa-angle-right"></i>
@@ -259,7 +304,7 @@
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                <form id="deleteForm" action="#" method="POST" style="display: inline;">
+                <form id="deleteForm" method="POST" style="display: inline;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger rounded-pill px-4">
@@ -272,14 +317,23 @@
 </div>
 
 <script>
-    function populateModal(item) {
-        // Set the grave identifier in the modal
-        document.getElementById('graveIdentifier').textContent = `Pusara ${item.pusaraNo} - ${item.section.replace('_', ' ')}`;
-        
-        // Update the delete form's action URL
-        const deleteUrl = `{{ url('admin/destroy') }}/${item.id}/package`;
-        document.getElementById('deleteForm').action = deleteUrl;
-    }
+function populateModal(item) {
+    // Set the grave identifier in the modal
+    document.getElementById('graveIdentifier').textContent = `Pusara ${item.pusaraNo} - ${item.section.replace('_', ' ')}`;
+    
+    // Update the delete form's action URL
+    const deleteUrl = `{{ route('admin.package.destroy', '') }}/${item.id}`;
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = deleteUrl;
+}
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
 </script>
 
 <style>

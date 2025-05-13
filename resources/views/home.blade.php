@@ -16,7 +16,7 @@
   <!-- Booking Stats Cards -->
 <div class="row mb-4">
     <!-- Total Bookings -->
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card border-0 shadow-sm rounded-3 h-100 bg-gradient-primary text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -33,7 +33,7 @@
     </div>
     
     <!-- Pending Bookings -->
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card border-0 shadow-sm rounded-3 h-100 bg-gradient-info text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -48,9 +48,26 @@
             </div>
         </div>
     </div>
+
+   <!-- Cancelled Bookings -->
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm rounded-3 h-100 bg-gradient-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-white-50 mb-2">Telah Dibatalkan</h6>
+                        <h2 class="mb-0">{{ $bookings->where('status', 'cancelled')->count() }}</h2>
+                    </div>
+                    <div class="icon-shape bg-white-10 rounded-circle p-3">
+                        <i class="fas fa-times-circle fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Completed Bookings -->
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card border-0 shadow-sm rounded-3 h-100 bg-gradient-success text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -215,6 +232,14 @@
     
     .bg-gradient-success {
         background: linear-gradient(90deg, #1cc88a 0%, #13855c 100%);
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(90deg, #f6c23e 0%, #dda20a 100%);
+    }
+
+    .bg-gradient-danger {
+        background: linear-gradient(90deg, #e74a3b 0%, #be2617 100%);
     }
     
     .bg-white-10 {

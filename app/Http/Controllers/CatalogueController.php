@@ -12,26 +12,29 @@ class CatalogueController extends Controller
      * ADMIN FUNCTIONS
      */
 
-    public function displayManagePackage(Request $request)
-    {
-        $packageQuery = Package::query();
-        $search = $request->input('search');
-        $filter = $request->input('filter');
-    
-        // Searching
-        if ($search) {
-            $packageQuery->where('pusaraNo', 'like', "%$search%");
-        }
-    
-        // Handle area filter
-        if ($filter && $filter !== 'all') {
-            $packageQuery->where('section', $filter);
-        }
-    
-        $package = $packageQuery->paginate(6);
-    
-        return view('ManageCatalogue.Admin.packageList', ['package' => $package]);
-    }
+     public function displayManagePackage(Request $request)
+     {
+         $packageQuery = Package::with(['bookings' => function($query) {
+             $query->where('status', '!=', 'cancelled');
+         }]);
+         
+         $search = $request->input('search');
+         $filter = $request->input('filter');
+     
+         // Searching
+         if ($search) {
+             $packageQuery->where('pusaraNo', 'like', "%$search%");
+         }
+     
+         // Handle area filter
+         if ($filter && $filter !== 'all') {
+             $packageQuery->where('section', $filter);
+         }
+     
+         $package = $packageQuery->paginate(6);
+     
+         return view('ManageCatalogue.Admin.packageList', ['package' => $package]);
+     }
 
     public function createPackage()
     {
@@ -124,19 +127,26 @@ class CatalogueController extends Controller
             ->with('success', 'Pusara dan kriteria MCDM berjaya dikemaskini!');
     }
 
-    public function destroyPackage(String $id)
+    public function destroyPackage($id)
     {
         $package = Package::findOrFail($id);
-    
+        
+        // Check if there are active bookings (only non-cancelled bookings)
+        if ($package->bookings()->where('status', '!=', 'cancelled')->exists()) {
+            return redirect()->back()
+                ->with('error', 'Pusara tidak boleh dipadam kerana terdapat tempahan aktif');
+        }
+        
+        // Delete associated image if exists
         if ($package->packageImage) {
             \Storage::disk('public')->delete($package->packageImage);
         }
-    
+        
         $package->delete();
         
-        return redirect()->route('admin.display.package')->with('destroy', 'Package deleted successfully!');
+        return redirect()->route('admin.display.package')
+            ->with('success', 'Pusara berjaya dipadam');
     }
-
     /**
      * CUSTOMER FUNCTIONS
      */

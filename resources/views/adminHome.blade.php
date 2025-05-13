@@ -63,29 +63,26 @@
             </div>
         </div>
 
-        <!-- Available Graves -->
+        <!-- Cancelled Bookings -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-3 h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-uppercase text-muted mb-2">
-                                <i class="fas fa-tombstone me-2"></i> Bilangan Pusara
+                                <i class="fas fa-times-circle me-2"></i> Dibatalkan
                             </h6>
-                            <h2 class="mb-0">{{ $stats['available_graves'] }}</h2>
+                            <h2 class="mb-0">{{ $stats['cancelled'] }}</h2>
                         </div>
-                        <div class="bg-success bg-opacity-10 p-3 rounded">
-                            <i class="fas fa-check text-success"></i>
+                        <div class="bg-danger bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-ban text-danger"></i>
                         </div>
                     </div>
-                    <div class="progress mt-3" style="height: 6px;">
-                        <div class="progress-bar bg-success" role="progressbar" 
-                             style="width: {{ $stats['grave_utilization'] }}%" 
-                             aria-valuenow="{{ $stats['grave_utilization'] }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100"></div>
+                    <div class="mt-3">
+                        <span class="badge bg-danger bg-opacity-10 text-danger">
+                            <i class="fas fa-calendar me-1"></i> Sehingga hari ini
+                        </span>
                     </div>
-                    <small class="text-muted">{{ $stats['grave_utilization'] }}% digunakan</small>
                 </div>
             </div>
         </div>
@@ -114,6 +111,37 @@
             </div>
         </div>
     </div>
+
+    <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">
+                                <i class="fas fa-tombstone me-2"></i> Bilangan Pusara
+                            </h6>
+                            <h2 class="mb-0">{{ $stats['available_graves'] }}</h2>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-warehouse text-success"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 6px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                            style="width: {{ $stats['grave_utilization'] }}%" 
+                            aria-valuenow="{{ $stats['grave_utilization'] }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{{ route('admin.create.package') }}" class="btn btn-sm btn-success flex-grow-1">
+                            <i class="fas fa-plus me-1"></i> Tambah
+                        </a>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- Charts and Recent Activity Row -->
     <div class="row mb-4 g-4">
@@ -393,6 +421,12 @@
     
     .rounded-3 {
         border-radius: 0.75rem !important;
+    }
+
+    .alert-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
     }
 </style>
 @endsection

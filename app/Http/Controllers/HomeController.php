@@ -49,6 +49,7 @@ class HomeController extends Controller
         $stats = [
             'total_bookings' => Booking::count(),
             'pending_approvals' => Booking::where('status', 'pending')->count(),
+            'cancelled' => Booking::where('status', 'cancelled')->count(),
             'available_graves' => Package::where('status', 'tersedia')->count(),
             'grave_utilization' => Package::count() > 0 
                 ? round((Package::count() - Package::where('status', 'available')->count()) / Package::count() * 100, 2)

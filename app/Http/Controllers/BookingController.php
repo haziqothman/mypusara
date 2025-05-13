@@ -37,20 +37,21 @@ class BookingController extends Controller
 
     
 
-   public function approveBooking(Request $request, $id)
-{
-    $request->validate([
-        'approval_notes' => 'nullable|string|max:500'
-    ]);
-
-    $booking = Booking::findOrFail($id);
-    $booking->status = 'confirmed';
-    $booking->approved_by = Auth::id();
-    $booking->approved_at = now();
-    $booking->save();
-
-    return redirect()->back()->with('success', 'Tempahan berjaya disahkan!');
-}
+    public function approveBooking($id)
+    {
+        $booking = Booking::findOrFail($id);
+        $booking->status = 'confirmed';
+        $booking->save();
+    
+        // Update package status
+        if ($booking->package) {
+            $booking->package->status = 'tidak_tersedia';
+            $booking->package->save();
+        }
+    
+        return redirect()->back()->with('success', 'Tempahan berjaya disahkan');
+    }
+    
     /**
      * CUSTOMER FUNCTIONS
      */
@@ -259,6 +260,21 @@ class BookingController extends Controller
     
         // Redirect or return a response
         return redirect()->route('admin.bookings.index')->with('success', 'Tempahan berjaya dikemaskini');
+    }
+
+    public function cancelBooking($id)
+    {
+        $booking = Booking::findOrFail($id);
+        $booking->status = 'cancelled';
+        $booking->save();
+
+        // Update package status if no other active bookings
+        if ($booking->package && !$booking->package->bookings()->where('status', '!=', 'cancelled')->exists()) {
+            $booking->package->status = 'tersedia';
+            $booking->package->save();
+        }
+
+        return redirect()->back()->with('success', 'Tempahan berjaya dibatalkan');
     }
 
     public function cancel($id)

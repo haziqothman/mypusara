@@ -142,7 +142,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="eventLocation" class="form-label">Hospital Si Mati</label>
+                                <label for="eventLocation" class="form-label">Lokasi Si Mati</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white"><i class="fas fa-hospital"></i></span>
                                     <input type="text" id="eventLocation" name="eventLocation" class="form-control" 

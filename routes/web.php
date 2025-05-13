@@ -104,9 +104,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
         Route::get('/package/{id}/edit', [CatalogueController::class, 'editPackage'])->name('admin.edit.package');
         Route::post('/update/{id}/package', [CatalogueController::class, 'updatePackage'])->name('admin.update.package');
         Route::put('/update/{id}/package', [CatalogueController::class, 'updatePackage'])->name('admin.update.package');
-        Route::delete('/destroy/{id}/package', [CatalogueController::class, 'destroyPackage'])->name('admin.destroy.package');
-        Route::delete('admin/package/{id}', [CatalogueController::class, 'destroy'])->name('admin.package.destroy');
-        Route::delete('/admin/package/{id}', [CatalogueController::class, 'destroyPackage'])->name('admin.destroy.package');
+        Route::delete('/package/{id}', [CatalogueController::class, 'destroyPackage'])->name('admin.package.destroy');
         Route::get('/package/map', [CatalogueController::class, 'showMap'])->name('package.map');
 
         // Manage Booking

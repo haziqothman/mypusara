@@ -23,19 +23,22 @@ class MCDMController extends Controller
             'drainage' => 'required|in:excellent,good,poor',
             'shade' => 'required|in:full_shade,partial_shade,no_shade'
         ]);
-
-        // Get all available graves
-        $packages = Package::where('status', 'tersedia')->get();
-
+    
+        // Get only truly available packages (status = tersedia and no active bookings)
+        $packages = Package::where('status', 'tersedia')
+            ->whereDoesntHave('bookings', function($query) {
+                $query->where('status', '!=', 'cancelled');
+            })
+            ->get();
+    
         // Apply MCDM algorithm
         $rankedPackages = $this->applyMCDM($packages, $validated);
-
+    
         return view('MCDM.results', [
             'packages' => $rankedPackages,
             'criteria' => $validated
         ]);
     }
-
     private function applyMCDM($packages, $criteria)
     {
         // Step 1: Define criteria weights based on user priorities

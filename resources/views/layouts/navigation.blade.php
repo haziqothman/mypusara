@@ -63,29 +63,28 @@
             </ul>
         </div>
 
-        <a id="navbarDropdown" class="nav-link dropdown-toggle col-1" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-            @if(Auth::check())
+        @auth
+            <a id="navbarDropdown" class="nav-link dropdown-toggle col-1" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                 {{ Auth::user()->name }}
-            @endif
-
-        </a>
-        <div class="dropdown-menu dropdown-menu-end col-1" aria-labelledby="navbarDropdown">
-             @if (Auth::check() && Auth::user()->type === 'admin')
-                <a href="{{ route('adminProfile.show') }}" class="dropdown-item"> Profile</a>
-            @elseif (Auth::check() && Auth::user()->type === 'customer')
-                <a href="{{ route('customerProfile.show') }}" class="dropdown-item"> Profile</a>
-            @endif
-            <a class="dropdown-item" href="{{ route('logout') }}"
-                onclick="event.preventDefault();
-                                document.getElementById('logout-form').submit();">
-                {{ __('Logout') }}
             </a>
 
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                @csrf
-            </form>
-        </div>
+            <div class="dropdown-menu dropdown-menu-end col-1" aria-labelledby="navbarDropdown">
+                @if (Auth::check() && Auth::user()->type === 'admin')
+                    <a href="{{ route('adminProfile.show') }}" class="dropdown-item"> Profile</a>
+                @elseif (Auth::check() && Auth::user()->type === 'customer')
+                    <a href="{{ route('customerProfile.show') }}" class="dropdown-item"> Profile</a>
+                @endif
+                <a class="dropdown-item" href="{{ route('logout') }}"
+                    onclick="event.preventDefault();
+                                    document.getElementById('logout-form').submit();">
+                    {{ __('Logout') }}
+                </a>
 
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
+            </div>
+        @endauth
     </nav>
     @yield('content')
 
