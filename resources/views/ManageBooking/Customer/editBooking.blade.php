@@ -122,12 +122,59 @@
                                     <div class="mb-3">
                                         <label for="no_sijil_kematian" class="form-label">No. Sijil Kematian</label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="as fa-award"></i></span>
+                                            <span class="input-group-text bg-white"><i class="fas fa-award"></i></span>
                                             <input type="text" id="no_sijil_kematian" name="no_sijil_kematian" 
                                                    value="{{ old('no_sijil_kematian', $booking->no_sijil_kematian) }}" 
                                                    class="form-control" placeholder="A1234567" required>
                                         </div>
                                     </div>
+
+                                   <div class="mb-3">
+    <label for="death_certificate_image" class="form-label">Sijil/Surat Kematian (Gambar)</label>
+    
+    <!-- Current Image Preview -->
+    @if($booking->death_certificate_image)
+        <div class="mb-3 border p-2 rounded" style="max-width: 300px;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold">Gambar Semasa:</span>
+                <button type="button" class="btn btn-sm btn-danger remove-image-btn" onclick="document.getElementById('removeImageFlag').value = '1'; this.closest('.mb-3').querySelector('img').style.opacity = '0.5'; this.disabled = true; this.innerHTML = '<i class=\'fas fa-check me-1\'></i> Akan dibuang';">
+                    <i class="fas fa-trash me-1"></i> Buang
+                </button>
+            </div>
+            <img src="{{ asset('death_certificates/' . $booking->death_certificate_image) }}" 
+                alt="Sijil Kematian" 
+                class="img-fluid rounded mb-2"
+                style="max-height: 150px;">
+            <a href="{{ asset('death_certificates/' . $booking->death_certificate_image) }}" 
+            target="_blank" 
+            class="btn btn-sm btn-outline-primary w-100">
+            <i class="fas fa-expand me-1"></i> Lihat Penuh
+            </a>
+        </div>
+        <input type="hidden" id="removeImageFlag" name="removeImage" value="0">
+    @endif
+    
+    <!-- Image Upload Field -->
+    <div class="input-group">
+        <input type="file" 
+            id="death_certificate_image" 
+            name="death_certificate_image" 
+            class="form-control" 
+            accept="image/*">
+    </div>
+    
+    <div class="form-text">
+        @if($booking->death_certificate_image)
+            Biarkan kosong jika tidak mahu menukar gambar
+        @else
+            Muat naik gambar sijil kematian (JPEG, PNG, maksimum 2MB)
+        @endif
+    </div>
+    
+    @error('death_certificate_image')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+</div>
 
                                     <div class="mb-3">
                                         <label for="area" class="form-label">Kawasan</label>
@@ -249,7 +296,50 @@
                         }, false)
                     })
             })();
+
+            // Image preview functionality
+            const imageInput = document.getElementById('death_certificate_image');
+            
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    // Remove existing preview if any
+                    const existingPreview = document.getElementById('imagePreview');
+                    if (existingPreview) {
+                        existingPreview.remove();
+                    }
+                    
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'img-fluid rounded';
+                            img.style.maxHeight = '150px';
+                            
+                            const previewContainer = document.createElement('div');
+                            previewContainer.id = 'imagePreview';
+                            previewContainer.className = 'border p-2 rounded mt-2';
+                            previewContainer.innerHTML = '<div class="fw-bold mb-2">Pratonton Baru:</div>';
+                            previewContainer.appendChild(img);
+                            
+                            imageInput.parentNode.parentNode.appendChild(previewContainer);
+                        }
+                        
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
         });
+
+        function removeImage() {
+            if (confirm('Adakah anda pasti ingin membuang gambar sijil kematian?')) {
+                document.getElementById('removeImageFlag').value = '1';
+                document.querySelector('.remove-image-btn').closest('.mb-3').querySelector('img').style.opacity = '0.5';
+                document.querySelector('.remove-image-btn').disabled = true;
+                document.querySelector('.remove-image-btn').innerHTML = '<i class="fas fa-check me-1"></i> Akan dibuang';
+            }
+        }
     </script>
 
     <style>

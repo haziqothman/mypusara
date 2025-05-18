@@ -18,7 +18,7 @@ class Booking extends Model
     protected $fillable = [
         'customerName', 'no_mykad', 'customerEmail', 'contactNumber',
         'area', 'nama_simati', 'no_mykad_simati', 'no_sijil_kematian','waris_address', // Add the new fields here
-        'notes', 'eventDate', 'eventTime', 'eventLocation', 'document_path', 'user_id', 'packageId', 'status'
+        'notes', 'cancel_reason', 'eventDate', 'eventTime', 'eventLocation', 'document_path', 'user_id', 'packageId', 'status', 'death_certificate_image'
     ];
     
     public function package()
@@ -53,6 +53,14 @@ class Booking extends Model
             $table->index('pusaraNo');
             $table->index('status');
         });
+
+        Schema::create('products', function (Blueprint $table) {
+        $table->id();
+        $table->string('name');
+        $table->text('description');
+        $table->string('image')->nullable();
+        $table->timestamps();
+    });
     }
 
 

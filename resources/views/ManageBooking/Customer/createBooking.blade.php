@@ -141,6 +141,22 @@
                                 </div>
                             </div>
 
+                             <div class="mb-3">
+                                <label for="death_certificate_image" class="form-label">Sijil Kematian</label>
+                                <div class="input-group">
+                                    <input type="file" 
+                                        name="death_certificate_image" 
+                                        id="death_certificate_image"
+                                        class="form-control @error('death_certificate_image') is-invalid @enderror"
+                                        required>
+                                    
+                                    @error('death_certificate_image')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <small class="text-muted">Format: JPEG, PNG, JPG, GIF (Max: 2MB)</small>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="eventLocation" class="form-label">Lokasi Si Mati</label>
                                 <div class="input-group">
@@ -202,6 +218,10 @@
                         </div>
                     </div>
                 </div>
+                
+               
+
+                
 
                 {{-- Form actions --}}
                 <div class="d-flex justify-content-between mt-5">
@@ -215,6 +235,7 @@
                     </button>
                 </div>
             </form>
+            
         </div>
     </div>
 </div>

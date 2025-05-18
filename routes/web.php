@@ -49,7 +49,8 @@ Route::middleware(['auth', 'user-access:customer'])->group(function () {
         Route::post('/customer/{id}/store-booking', [BookingController::class, 'store'])->name('customer.store.booking');
         Route::get('/customer/booking/{id}/edit', [BookingController::class, 'edit'])->name('ManageBooking.Customer.editBooking');
         Route::put('/customer/booking/{id}', [BookingController::class, 'update'])->name('customer.update.booking');
-        Route::get('/booking/{id}/cancel', [BookingController::class, 'cancel'])->name('customer.cancel.booking');
+       Route::get('/customer/cancel-booking/{id}', [BookingController::class, 'cancelBooking'])
+    ->name('customer.cancel.booking');
         Route::get('/booking/{id}/create', [BookingController::class, 'create'])->name('customer.create.booking');
         // Route::get('/booking/{id}/create', [BookingController::class, 'create'])->name('customer.booking.create');
         Route::get('/booking/{id}/view', [BookingController::class, 'view'])->name('ManageBooking.Customer.viewBooking');
@@ -106,7 +107,8 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
         Route::put('/update/{id}/package', [CatalogueController::class, 'updatePackage'])->name('admin.update.package');
         Route::delete('/package/{id}', [CatalogueController::class, 'destroyPackage'])->name('admin.package.destroy');
         Route::get('/package/map', [CatalogueController::class, 'showMap'])->name('package.map');
-
+        Route::get('/admin/get-available-lots', [CatalogueController::class, 'getAvailableLots']);
+       
         // Manage Booking
         Route::get('/admin/dashboard', [BookingController::class, 'showAdmin'])->name('ManageBooking.Admin.dashboardBooking');
         Route::get('/bookings', [BookingController::class, 'indexAdmin'])->name('admin.bookings.index'); // View all bookings
@@ -123,6 +125,9 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
         Route::get('/admin/booking/{id}/view', [BookingController::class, 'viewAdmin'])->name('ManageBooking.Admin.viewBooking');
         Route::delete('/admin/bookings/{booking}', [BookingController::class, 'destroy'])
         ->name('admin.bookings.destroy');
+        Route::get('image-upload', [ BookingController::class, 'imageUpload' ])->name('image.upload');
+
+Route::post('image-upload', [ BookingController::class, 'imageUploadPost' ])->name('image.upload.post');
         /**
          * Manage Admin Profile
          */

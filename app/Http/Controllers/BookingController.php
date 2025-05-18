@@ -114,8 +114,18 @@ class BookingController extends Controller
             'eventDate' => 'required|date|after_or_equal:today',
             'eventTime' => 'required|date_format:H:i',
             'eventLocation' => 'required|string|max:255',
+            'death_certificate_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-    
+
+        try {
+        // Handle image upload - same approach as your package images
+        $filePath = public_path('death_certificates');
+        $file = $request->file('death_certificate_image');
+        $file_name = time() . '_' . $file->getClientOriginalName();
+        $file->move($filePath, $file_name);
+
+        // dd($filePath, $file_name);
+            
         Booking::create([
            'customerName' => $validated['customerName'],
             'no_mykad' => $validated['no_mykad'],
@@ -133,12 +143,19 @@ class BookingController extends Controller
             'eventLocation' => $validated['eventLocation'],
             'user_id' => Auth::id(),
             'packageId' => $id,
-            'status' => 'pending'
+            'status' => 'pending',
+            'death_certificate_image' => $validated['death_certificate_image'] ? $file_name : null,
         ]);
     
         return redirect()->route('ManageBooking.Customer.dashboardBooking')
         ->with('success', 'Tempahan berjaya dibuat! Notifikasi telah dihantar kepada penggali pusara.');
+    
+     } catch (\Exception $e) {
+        return back()
+            ->with('error', 'Ralat: '.$e->getMessage())
+            ->withInput();
     }
+}
 
     private function sendGraveDiggerNotification($booking, $package)
     {
@@ -220,6 +237,7 @@ class BookingController extends Controller
         $booking->eventDate = $request->input('eventDate');
         $booking->eventTime = $request->input('eventTime');
         $booking->eventLocation = $request->input('eventLocation');
+        $booking->death_certificate_image = $request->input('death_certificate_image');
     
         // Save the updated booking
         $booking->save();
@@ -277,30 +295,19 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Tempahan berjaya dibatalkan');
     }
 
-    public function cancel($id)
-    {
-        try {
-            $booking = Booking::findOrFail($id);
-            $booking->status = 'cancelled';
-            $booking->save();
-            
-            Log::info('Booking Cancelled', [
-                'booking_id' => $id,
-                'user_id' => Auth::id()
-            ]);
-
-            return redirect()->route('customer.bookings')->with('success', 'Booking cancelled successfully!');
-            
-        } catch (\Exception $e) {
-            Log::error('Booking Cancellation Failed', [
-                'booking_id' => $id,
-                'error' => $e->getMessage()
-            ]);
-            
-            return back()->with('error', 'Booking cancelled successfully');
-        }
+   public function cancel($id)
+{
+    $booking = Booking::findOrFail($id);
+    
+    // Validate booking can be cancelled
+    if ($booking->status != 'pending') {
+        return back()->with('error', 'Hanya tempahan dalam proses boleh dibatalkan.');
     }
-
+    
+    $booking->update(['status' => 'cancelled']);
+    
+    return back()->with('success', 'Tempahan telah dibatalkan.');
+}
     public function getBookedDates()
     {
         $bookedDates = Booking::pluck('eventDate');

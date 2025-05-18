@@ -113,17 +113,38 @@
                                                     <i class="fas fa-edit"></i>
                                                 </a>
 
-                                                <!-- Cancel Button -->
-                                                <a href="{{ route('customer.cancel.booking', $booking->id) }}" 
-                                                class="btn btn-sm btn-outline-danger rounded-circle p-2 @if($booking->status == 'confirmed' || $booking->status == 'cancelled') disabled @endif" 
+                                              <!-- Cancel Button -->
+                                            <button type="button"
+                                                class="btn btn-sm btn-outline-danger rounded-circle p-2 @if($booking->status != 'pending') disabled @endif"
                                                 title="Cancel"
-                                                data-bs-toggle="tooltip"
-                                                onclick="return confirm('Adakah anda pasti ingin membatalkan tempahan ini?')"
-                                                @if($booking->status == 'confirmed' || $booking->status == 'cancelled') onclick="return false;" @endif>
-                                                    <i class="fas fa-times"></i>
-                                                </a>
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#cancelModal"
+                                                data-booking-id="{{ $booking->id }}"
+                                                @if($booking->status != 'pending') disabled @endif>
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                             </div>
                                         </td>
+
+                                        <div class="modal fade" id="cancelModal" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title">Pengesahan Pembatalan</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Adakah anda pasti ingin membatalkan tempahan ini?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kembali</button>
+                                                        <a id="confirmCancelBtn" href="#" class="btn btn-danger">
+                                                            <i class="fas fa-times-circle me-1"></i> Sahkan
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -135,6 +156,8 @@
            
         @endif
     </div>
+
+  
 
     <!-- Custom CSS -->
     <style>
@@ -206,14 +229,28 @@
         }
     </style>
 
-    <!-- JavaScript -->
-    <script>
-        // Enable tooltips
-        document.addEventListener('DOMContentLoaded', function() {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
-        });
-    </script>
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enable tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Handle cancel modal
+    var cancelModal = document.getElementById('cancelModal');
+    
+    cancelModal.addEventListener('show.bs.modal', function(event) {
+        var button = event.relatedTarget;
+        var bookingId = button.getAttribute('data-booking-id');
+        var confirmBtn = document.getElementById('confirmCancelBtn');
+        
+        // Set the href dynamically
+        confirmBtn.href = "{{ route('customer.cancel.booking', '') }}/" + bookingId;
+        
+        console.log("Setting cancel URL to:", confirmBtn.href);
+    });
+});
+</script>
 @endsection

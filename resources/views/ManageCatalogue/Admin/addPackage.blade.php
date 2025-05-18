@@ -35,9 +35,9 @@
                             <select class="form-select @error('section') is-invalid @enderror" 
                                     id="section" name="section" required>
                                 <option value="" disabled selected>Pilih Kawasan</option>
-                                <option value="section_A" {{ old('section') == 'section_A' ? 'selected' : '' }}>Area Pintu Masuk</option>
-                                <option value="section_B" {{ old('section') == 'section_B' ? 'selected' : '' }}>Area Tandas dan stor</option>
-                                <option value="section_C" {{ old('section') == 'section_C' ? 'selected' : '' }}>Area pintu Belakang</option>
+                                <option value="section_A" {{ old('section') == 'section_A' ? 'selected' : '' }}>Area Pintu Masuk (Kawasan A)</option>
+                                <option value="section_B" {{ old('section') == 'section_B' ? 'selected' : '' }}>Area pintu Belakang(Kawasan B)</option>
+                                <option value="section_C" {{ old('section') == 'section_C' ? 'selected' : '' }}>Area Tandas dan stor (Kawasan C)</option>
                             </select>
                             @error('section')
                                 <div class="invalid-feedback">{{ $message }}</div>

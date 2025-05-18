@@ -150,7 +150,7 @@
 <!-- Features Section -->
 <section class="features-section">
   <div class="container">
-    <h2 class="text-center section-title">Mengapa Pilih myPusara?</h2>
+    <h2 class="text-center section-title">Mengapa Pilih MyPusara?</h2>
     <div class="row g-4">
       <div class="col-md-4">
         <div class="feature-box">

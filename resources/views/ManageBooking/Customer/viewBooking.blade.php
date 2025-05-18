@@ -84,6 +84,9 @@
                                         @endif
                                     </span>
                                 </div>
+
+                        
+
                                 <div class="detail-item">
                                     <span class="detail-label">Tarikh Meninggal:</span>
                                     <span class="detail-value">{{ $booking->eventDate }}</span>
@@ -97,6 +100,27 @@
                     </div>
                 </div>
 
+
+                @if($booking->death_certificate_image)
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-file-certificate me-2"></i> Sijil Kematian</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <img class="card-img-top" 
+                                src="{{ asset('death_certificates/' . $booking->death_certificate_image)}}" 
+                                alt="Sijil Kematian"
+                                style="width: 100%; height: auto; max-height: 500px; object-fit: contain;">
+                        </div>
+                    </div>
+                @else
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Tiada sijil kematian dimuat naik
+                    </div>
+                @endif
+                           
+                
                 {{-- Location Section --}}
                 @if($booking->package && $booking->package->latitude && $booking->package->longitude)
                 <div class="detail-section mb-4">

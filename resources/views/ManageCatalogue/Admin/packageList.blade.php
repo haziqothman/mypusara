@@ -49,15 +49,15 @@
                     </a>
                     <a href="{{ route('admin.display.package', ['filter' => 'section_A']) }}" 
                        class="btn {{ request('filter') == 'section_A' ? 'btn-primary' : 'btn-outline-primary' }}">
-                       <i class="fas fa-door-open me-1"></i> Pintu Masuk
-                    </a>
-                    <a href="{{ route('admin.display.package', ['filter' => 'section_B']) }}" 
-                       class="btn {{ request('filter') == 'section_B' ? 'btn-primary' : 'btn-outline-primary' }}">
-                        <i class="fas fa-toilet me-1"></i> Tandas & Stor
+                       <i class="fas fa-door-open me-1"></i> Pintu Masuk (A)
                     </a>
                     <a href="{{ route('admin.display.package', ['filter' => 'section_C']) }}" 
                        class="btn {{ request('filter') == 'section_C' ? 'btn-primary' : 'btn-outline-primary' }}">
-                        <i class="fas fa-door-closed me-1"></i> Pintu Belakang
+                        <i class="fas fa-door-closed me-1"></i> Pintu Belakang (B)
+                    </a>
+                    <a href="{{ route('admin.display.package', ['filter' => 'section_B']) }}" 
+                       class="btn {{ request('filter') == 'section_B' ? 'btn-primary' : 'btn-outline-primary' }}">
+                        <i class="fas fa-toilet me-1"></i> Tandas & Stor (C)
                     </a>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                         <input type="text" class="form-control border-start-0 ps-1" placeholder="Cari nombor pusara..." name="search" 
                                value="{{ request('search') }}">
                         <button class="btn btn-primary px-3" type="submit">
-                            <i class="fas fa-filter me-1"></i> Filter
+                             <i class="fas fa-search me-1"></i> Cari
                         </button>
                     </div>
                 </form>
@@ -126,10 +126,10 @@
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             <div>
                                 <strong>Pusara ini telah ditempah!</strong>
-                                @foreach($item->bookings as $booking)
+                                <!-- @foreach($item->bookings as $booking)
                                     Waris: {{ $booking->warisName }} (No. Tel: {{ $booking->warisPhone }})
                                     @if(!$loop->last) | @endif
-                                @endforeach
+                                @endforeach -->
                             </div>
                             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>

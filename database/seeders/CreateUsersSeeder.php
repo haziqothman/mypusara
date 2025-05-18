@@ -31,13 +31,6 @@ class CreateUsersSeeder extends Seeder
                'password'=> bcrypt('123456'),
                'postcode' => '54321', // Add postcode field
             ],
-            [
-                'name'=>'GraveDigger',
-                'email'=>'gravedigger@itsolutionstuff.com',
-                'type'=>3,
-                'password'=> bcrypt('123456'),
- 
-             ],
         ];
     
         foreach ($users as $key => $user) {

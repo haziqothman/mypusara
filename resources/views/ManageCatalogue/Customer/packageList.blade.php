@@ -46,7 +46,7 @@
                     <a href="{{ route('customer.display.package', ['filter' => 'section_B']) }}" 
                        class="btn btn-sm btn-outline-primary rounded-pill px-4 filter-link {{ request('filter') == 'section_B' ? 'active' : '' }}" 
                        data-filter="section_B">
-                        <i class="fas fa-toilet me-2"></i> Tandas & Stor
+                        <i class="fas fa-store me-2"></i> Tandas & Stor
                     </a>
                     <a href="{{ route('customer.display.package', ['filter' => 'section_C']) }}" 
                        class="btn btn-sm btn-outline-primary rounded-pill px-4 filter-link {{ request('filter') == 'section_C' ? 'active' : '' }}" 
@@ -93,7 +93,7 @@
                 </div>
                 <div class="legend-item compact">
                     <div class="legend-icon toilet-icon">
-                        <i class="fas fa-toilet fs-6"></i>
+                        <i class="fas fa-store me-6"></i>
                     </div>
                     <span class="ms-1">Tandas & Stor</span>
                 </div>
@@ -137,7 +137,7 @@
                     <span class="landmark-label">Pintu Masuk</span>
                 </div>
                 <div class="landmark toilet">
-                    <i class="fas fa-toilet"></i>
+                    <i class="fas fa-store me"></i>
                     <span class="landmark-label">Tandas & Stor</span>
                 </div>
                 <div class="landmark exit">
@@ -212,7 +212,7 @@
                 <div class="partition partition-b" id="section-b" data-section="section_B">
                     <div class="section-header">
                         <h6 class="section-title">
-                            <i class="fas fa-toilet me-2"></i> Kawasan Tandas & Stor
+                            <i class="fas fa-store me-2"></i> Kawasan Tandas & Stor
                         </h6>
                     </div>
                     <div class="grave-grid">
@@ -460,7 +460,7 @@
 
     /* Fixed landmark positions - Updated to center the entrance */
     .entrance {
-        top: 5%;
+        top: 3%;
         left: 15px;
         transform: translateY(-50%);
         background: linear-gradient(135deg, var(--primary-color), #3a56c8);
@@ -476,7 +476,7 @@
     }
 
     .exit {
-        top: 20px;
+        top: 3px;
         right: 20px;
         background: linear-gradient(135deg, var(--exit-color), #5a3ab6);
     }
@@ -492,7 +492,7 @@
         gap: 1.5rem;
         position: relative;
         z-index: 2;
-        margin-top: 30px;
+        margin-top: 5px;
     }
 
     .partition {

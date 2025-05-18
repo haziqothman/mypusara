@@ -57,6 +57,8 @@ class CatalogueController extends Controller
             'status' => 'required|string|in:tersedia,tidak_tersedia,dalam_penyelanggaraan',
             'packageDesc' => 'required|string',
             'packageImage' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             // MCDM fields
             'proximity_rating' => 'required|in:high,medium,low',
             'accessibility_rating' => 'required|in:excellent,good,poor',
