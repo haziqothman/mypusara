@@ -8,6 +8,7 @@ use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class BookingController extends Controller
 {
@@ -124,7 +125,7 @@ class BookingController extends Controller
         $file_name = time() . '_' . $file->getClientOriginalName();
         $file->move($filePath, $file_name);
 
-        // dd($filePath, $file_name);
+       
             
         Booking::create([
            'customerName' => $validated['customerName'],
@@ -218,32 +219,122 @@ class BookingController extends Controller
         return view('ManageBooking.Customer.editBooking', compact('booking', 'packages'));
     }
 
-    public function update(Request $request, $id)
+   public function update(Request $request, Booking $booking)
+{
+    // $booking = Booking::findOrFail($id);
+
+    // $validated = $request->validate([
+    //     'customerName' => 'required|string|max:255',
+    //     'no_mykad' => 'required|string|max:20',
+    //     'customerEmail' => 'required|email|max:255',
+    //     'contactNumber' => 'required|string|max:20',
+    //     'jantina_simati' => 'required|in:Lelaki,Perempuan',
+    //     'area' => 'required|string|max:100',
+    //     'nama_simati' => 'required|string|max:255',
+    //     'no_mykad_simati' => 'required|string|max:20',
+    //     'no_sijil_kematian' => 'required|string|max:20',
+    //     'waris_address' => 'required|string|max:255',
+    //     'notes' => 'nullable|string|max:500',
+    //     'eventDate' => 'required|date|after_or_equal:today',
+    //     'eventTime' => 'required|date_format:H:i',
+    //     'eventLocation' => 'required|string|max:255',
+    //     'death_certificate_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+    // ]);
+
+        function makeDevFormValidator(array $data, array $rules): array
     {
-        $booking = Booking::findOrFail($id);  // Find the booking by ID
-    
-        // Update the fields
-        $booking->customerName = $request->input('customerName');
-        $booking->no_mykad = $request->input('no_mykad');
-        $booking->customerEmail = $request->input('customerEmail');
-        $booking->contactNumber = $request->input('contactNumber');
-        $booking->area = $request->input('area');
-        $booking->no_mykad_simati = $request->input('no_mykad_simati');
-        $booking->jantina_simati = $request->input('jantina_simati');
-        $booking->no_sijil_kematian = $request->input('no_sijil_kematian');
-        $booking->waris_address = $request->input('waris_address');
-        $booking->nama_simati = $request->input('nama_simati');
-        $booking->notes = $request->input('notes');
-        $booking->eventDate = $request->input('eventDate');
-        $booking->eventTime = $request->input('eventTime');
-        $booking->eventLocation = $request->input('eventLocation');
-        $booking->death_certificate_image = $request->input('death_certificate_image');
-    
-        // Save the updated booking
+        $validator = Validator::make($data, $rules);
+
+        $response = function () use ($validator) {
+            return response()->json([
+                'at' => 'form',
+                'errors' => $validator->errors(),
+                'data' => $validator->getData(),
+            ], 422);
+        };
+
+        return [
+            'validator' => $validator,
+            'response' => $response,
+        ];
+    }
+
+    $validation = makeDevFormValidator ($request->all(), [
+        'customerName' => 'required|string|max:255',
+        'no_mykad' => 'required|string|max:20',
+        'customerEmail' => 'required|email|max:255',
+        'contactNumber' => 'required|string|max:20',
+        'jantina_simati' => 'required|in:Lelaki,Perempuan',
+        'area' => 'required|string|max:100',
+        'nama_simati' => 'required|string|max:255',
+        'no_mykad_simati' => 'required|string|max:20',
+        'no_sijil_kematian' => 'required|string|max:20',
+        'waris_address' => 'required|string|max:255',
+        'notes' => 'nullable|string|max:500',
+        'eventDate' => 'required|date|after_or_equal:today',
+        'eventTime' => 'required|date_format:H:i:s',
+        'eventLocation' => 'required|string|max:255',
+        'death_certificate_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+    ]);
+
+     if ($validation['validator']->fails()) {
+            return $validation['response']();
+        }
+
+        $validated = $validation['validator']->validated();
+
+    try {
+        // Handle new image upload if provided
+        if ($request->hasFile('death_certificate_image')) {
+            // Delete old image if exists
+            if ($booking->death_certificate_image) {
+                $oldFilePath = public_path('death_certificates/' . $booking->death_certificate_image);
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                }
+            }
+            
+            // Upload new image
+            $filePath = public_path('death_certificates');
+            $file = $request->file('death_certificate_image');
+            $file_name = time() . '_' . $file->getClientOriginalName();
+            $file->move($filePath, $file_name);
+            
+            $booking->death_certificate_image = $file_name;
+        }
+
+        // Update all fields
+        $booking->customerName = $validated['customerName'];
+        $booking->no_mykad = $validated['no_mykad'];
+        $booking->customerEmail = $validated['customerEmail'];
+        $booking->contactNumber = $validated['contactNumber'];
+        $booking->jantina_simati = $validated['jantina_simati'];
+        $booking->area = $validated['area'];
+        $booking->nama_simati = $validated['nama_simati'];
+        $booking->no_mykad_simati = $validated['no_mykad_simati'];
+        $booking->no_sijil_kematian = $validated['no_sijil_kematian'];
+        $booking->waris_address = $validated['waris_address'];
+        $booking->notes = $validated['notes'] ?? null;
+        $booking->eventDate = $validated['eventDate'];
+        $booking->eventTime = $validated['eventTime'];
+        $booking->eventLocation = $validated['eventLocation'];
+        // $booking->death_certificate_image = $validated['death_certificate_image'];
+
         $booking->save();
-    
-        // Redirect or return a response
-        return redirect()->route('ManageBooking.Customer.dashboardBooking')->with('success', 'Tempahan berjaya dikemaskini');
+
+        return redirect()->route('ManageBooking.Customer.dashboardBooking')
+            ->with('success', 'Tempahan berjaya dikemaskini!');
+
+    } catch (\Exception $e) {
+        // return back()
+        //     ->with('error', 'Ralat: '.$e->getMessage())
+        //     ->withInput();
+
+        return response()->json([
+            'error' => 'Ralat: '.$e->getMessage(),
+            'data' => $request->all()
+        ], 500);
+       }
     }
     
     public function editAdmin($id)

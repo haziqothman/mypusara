@@ -112,6 +112,11 @@
                                 alt="Sijil Kematian"
                                 style="width: 100%; height: auto; max-height: 500px; object-fit: contain;">
                         </div>
+                          <a href="{{ asset('death_certificates/' . $booking->death_certificate_image) }}" 
+                                target="_blank" 
+                                class="btn btn-sm btn-outline-primary w-100">
+                                <i class="fas fa-expand me-1"></i> Lihat Penuh
+                          </a>
                     </div>
                 @else
                     <div class="alert alert-warning">

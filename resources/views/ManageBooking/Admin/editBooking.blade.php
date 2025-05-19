@@ -10,7 +10,8 @@
                     <div class="card-header bg-primary text-white py-3">
                         <div class="d-flex align-items-center justify-content-between">
                             <h2 class="h5 mb-0">
-                                <i class="fas fa-calendar-edit me-2"></i> Kemaskini Tempahan
+                                <i class="fas fa-calendar-edit me-2"></i> Kemaskini Tempahan @session('error') {{ $value }} @endsession
+                                @endsession
                             </h2>
                             <!-- <a href="{{ route('ManageBooking.Admin.dashboardBooking') }}" class="btn btn-sm btn-light">
                                 <i class="fas fa-arrow-left me-1"></i> Kembali

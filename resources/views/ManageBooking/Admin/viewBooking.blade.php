@@ -118,6 +118,11 @@
                         Tiada sijil kematian dimuat naik
                     </div>
                 @endif
+                 <a href="{{ asset('death_certificates/' . $booking->death_certificate_image) }}" 
+                    target="_blank" 
+                    class="btn btn-sm btn-outline-primary w-100">
+                    <i class="fas fa-expand me-1"></i> Lihat Penuh
+                </a>
                 
 
                 <div class="divider my-4" style="height: 1px; background: rgba(0,0,0,0.1);"></div>

@@ -130,51 +130,47 @@
                                     </div>
 
                                    <div class="mb-3">
-    <label for="death_certificate_image" class="form-label">Sijil/Surat Kematian (Gambar)</label>
-    
-    <!-- Current Image Preview -->
-    @if($booking->death_certificate_image)
-        <div class="mb-3 border p-2 rounded" style="max-width: 300px;">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="fw-bold">Gambar Semasa:</span>
-                <button type="button" class="btn btn-sm btn-danger remove-image-btn" onclick="document.getElementById('removeImageFlag').value = '1'; this.closest('.mb-3').querySelector('img').style.opacity = '0.5'; this.disabled = true; this.innerHTML = '<i class=\'fas fa-check me-1\'></i> Akan dibuang';">
-                    <i class="fas fa-trash me-1"></i> Buang
-                </button>
-            </div>
-            <img src="{{ asset('death_certificates/' . $booking->death_certificate_image) }}" 
-                alt="Sijil Kematian" 
-                class="img-fluid rounded mb-2"
-                style="max-height: 150px;">
-            <a href="{{ asset('death_certificates/' . $booking->death_certificate_image) }}" 
-            target="_blank" 
-            class="btn btn-sm btn-outline-primary w-100">
-            <i class="fas fa-expand me-1"></i> Lihat Penuh
-            </a>
-        </div>
-        <input type="hidden" id="removeImageFlag" name="removeImage" value="0">
-    @endif
-    
-    <!-- Image Upload Field -->
-    <div class="input-group">
-        <input type="file" 
-            id="death_certificate_image" 
-            name="death_certificate_image" 
-            class="form-control" 
-            accept="image/*">
-    </div>
-    
-    <div class="form-text">
-        @if($booking->death_certificate_image)
-            Biarkan kosong jika tidak mahu menukar gambar
-        @else
-            Muat naik gambar sijil kematian (JPEG, PNG, maksimum 2MB)
-        @endif
-    </div>
-    
-    @error('death_certificate_image')
-        <div class="invalid-feedback d-block">{{ $message }}</div>
-    @enderror
-</div>
+                                        <label for="death_certificate_image" class="form-label">Sijil/Surat Kematian (Gambar)</label>
+                                        
+                                        <!-- Current Image Preview -->
+                                        @if($booking->death_certificate_image)
+                                            <div class="mb-3 border p-2 rounded" style="max-width: 300px;">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="fw-bold">Gambar Semasa:</span>
+                                                </div>
+                                                <img src="{{ asset('death_certificates/' . $booking->death_certificate_image) }}" 
+                                                    alt="Sijil Kematian" 
+                                                    class="img-fluid rounded mb-2"
+                                                    style="max-height: 150px;">
+                                                <a href="{{ asset('death_certificates/' . $booking->death_certificate_image) }}" 
+                                                target="_blank" 
+                                                class="btn btn-sm btn-outline-primary w-100">
+                                                <i class="fas fa-expand me-1"></i> Lihat Penuh
+                                                </a>
+                                            </div>
+                                        @endif
+                                        
+                                        <!-- Image Upload Field -->
+                                        <div class="input-group">
+                                            <input type="file" 
+                                                id="death_certificate_image" 
+                                                name="death_certificate_image" 
+                                                class="form-control" 
+                                                accept="image/*">
+                                        </div>
+                                        
+                                        <div class="form-text">
+                                            @if($booking->death_certificate_image)
+                                                Biarkan kosong jika tidak mahu menukar gambar
+                                            @else
+                                                Muat naik gambar sijil kematian (JPEG, PNG, maksimum 2MB)
+                                            @endif
+                                        </div>
+                                        
+                                        @error('death_certificate_image')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
 
                                     <div class="mb-3">
                                         <label for="area" class="form-label">Kawasan</label>
