@@ -13,46 +13,88 @@ class CatalogueController extends Controller
      */
 
      public function displayManagePackage(Request $request)
-     {
-         $packageQuery = Package::with(['bookings' => function($query) {
-             $query->where('status', '!=', 'cancelled');
-         }]);
-         
-         $search = $request->input('search');
-         $filter = $request->input('filter');
-     
-         // Searching
-         if ($search) {
-             $packageQuery->where('pusaraNo', 'like', "%$search%");
-         }
-     
-         // Handle area filter
-         if ($filter && $filter !== 'all') {
-             $packageQuery->where('section', $filter);
-         }
-     
-         $package = $packageQuery->paginate(6);
-     
-         return view('ManageCatalogue.Admin.packageList', ['package' => $package]);
-     }
-
-    public function createPackage()
+    {
+        $packageQuery = Package::with(['bookings' => function($query) {
+            $query->where('status', '!=', 'cancelled');
+        }]);
+        
+        $search = $request->input('search');
+        $filter = $request->input('filter');
+    
+        // Searching
+        if ($search) {
+            $packageQuery->where('pusaraNo', 'like', "%$search%");
+        }
+    
+        // Handle area filter
+        if ($filter && $filter !== 'all') {
+            $packageQuery->where('section', $filter);
+        }
+    
+        $package = $packageQuery->paginate(6);
+    
+        return view('ManageCatalogue.Admin.packageList', ['package' => $package]);
+    }
+   public function createPackage()
     {
         $sections = [
-            'section_A' => 'Area Pintu Masuk',
-            'section_B' => 'Area Tandas dan stor',
-            'section_C' => 'Area pintu Belakang'
+            'section_A' => 'Area Pintu Masuk (A)',
+            'section_B' => 'Area Tandas dan stor (B)',
+            'section_C' => 'Area pintu Belakang (C)'
         ];
         
         $mcdmOptions = $this->getMcdmOptions();
         
-        return view('ManageCatalogue.Admin.addPackage', compact('sections', 'mcdmOptions'));
+        // Generate all possible lot numbers (A001-A100, B001-B100, C001-C100)
+        $allPossibleLots = [];
+        foreach (['A', 'B', 'C'] as $prefix) {
+            for ($i = 1; $i <= 100; $i++) {
+                $allPossibleLots[] = $prefix . str_pad($i, 3, '0', STR_PAD_LEFT);
+            }
+        }
+        
+        // Get used lot numbers
+        $usedLots = Package::pluck('pusaraNo')->toArray();
+        
+        // Calculate available lots
+        $availableLots = array_diff($allPossibleLots, $usedLots);
+        
+        // Get the next available lot number for each section
+        $nextAvailable = [
+            'A' => $this->getNextAvailableLot('A', $usedLots),
+            'B' => $this->getNextAvailableLot('B', $usedLots),
+            'C' => $this->getNextAvailableLot('C', $usedLots)
+        ];
+        
+        return view('ManageCatalogue.Admin.addPackage', compact(
+            'sections', 
+            'mcdmOptions', 
+            'availableLots',
+            'nextAvailable'
+        ));
     }
 
-    public function storePackage(Request $request)
+   private function getNextAvailableLot($prefix, $usedLots)
+    {
+        $maxNumber = 0;
+        $pattern = '/^' . $prefix . '(\d{3})$/';
+        
+        foreach ($usedLots as $lot) {
+            if (preg_match($pattern, $lot, $matches)) {
+                $num = (int)$matches[1];
+                if ($num > $maxNumber) {
+                    $maxNumber = $num;
+                }
+            }
+        }
+        
+        $nextNumber = min($maxNumber + 1, 100); // Don't exceed 100
+        return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    }
+
+   public function storePackage(Request $request)
     {
         $validated = $request->validate([
-            'pusaraNo' => 'required|string|max:255|unique:packages,pusaraNo',
             'section' => 'required|string|in:section_A,section_B,section_C',
             'status' => 'required|string|in:tersedia,tidak_tersedia,dalam_penyelanggaraan',
             'packageDesc' => 'required|string',
@@ -67,67 +109,164 @@ class CatalogueController extends Controller
             'drainage_rating' => 'required|in:excellent,good,poor',
             'shade_coverage' => 'required|in:full,partial,none'
         ]);
-    
+
+        // Handle pusara number
+        if ($request->pusaraNo === 'manual') {
+            // Use manual input
+            $request->validate([
+                'manualPusaraNo' => [
+                    'required',
+                    'string',
+                    'max:4',
+                    'regex:/^[A-Z][0-9]{3}$/',
+                    'unique:packages,pusaraNo'
+                ]
+            ], [
+                'manualPusaraNo.regex' => 'Format nombor lot tidak sah. Sila gunakan format huruf besar diikuti 3 digit nombor (Contoh: A123, B045, Z999)',
+                'manualPusaraNo.unique' => 'Nombor lot ini sudah wujud dalam sistem'
+            ]);
+            
+            $pusaraNo = strtoupper($request->manualPusaraNo);
+        } elseif ($request->pusaraNo === 'auto') {
+            // Auto-generate
+            $prefix = substr($request->section, -1); // Gets A, B, or C from section_A, etc.
+            $usedLots = Package::pluck('pusaraNo')->toArray();
+            $pusaraNo = $this->getNextAvailableLot($prefix, $usedLots);
+            
+            if (Package::where('pusaraNo', $pusaraNo)->exists()) {
+                return back()->withInput()->withErrors([
+                    'pusaraNo' => 'Nombor lot yang dijana automatik sudah wujud'
+                ]);
+            }
+        } else {
+            // Selected from dropdown
+            $pusaraNo = $request->pusaraNo;
+            
+            if (Package::where('pusaraNo', $pusaraNo)->exists()) {
+                return back()->withInput()->withErrors([
+                    'pusaraNo' => 'Nombor lot pusara ini sudah digunakan'
+                ]);
+            }
+        }
+
+        // Add pusaraNo to validated data
+        $validated['pusaraNo'] = $pusaraNo;
+
         $package = new Package();
         $package->fill($validated);
         $package->userId = Auth::id();
-    
-        if ($request->hasFile('packageImage')) {
-            $path = $request->file('packageImage')->store('package_images', 'public');
-            $package->packageImage = $path;
-        }
-    
-        $package->save();
-    
-        return redirect()->route('admin.display.package')
-            ->with('success', 'Pusara berjaya ditambah dengan kriteria MCDM!');
-    }
-
-    public function editPackage(String $id)
-    {
-        $package = Package::findOrFail($id);
-        $sections = [
-            'section_A' => 'Area Pintu Masuk',
-            'section_B' => 'Area Tandas dan stor',
-            'section_C' => 'Area pintu Belakang'
-        ];
-        $mcdmOptions = $this->getMcdmOptions();
         
-        return view('ManageCatalogue.Admin.editPackage', compact('package', 'sections', 'mcdmOptions'));
-    }
-
-    public function updatePackage(Request $request, String $id)
-    {
-        $package = Package::findOrFail($id);
-    
-        $validated = $request->validate([
-            'pusaraNo' => ['required', 'string', 'max:255', 'unique:packages,pusaraNo,'.$id],
-            'status' => ['required', 'in:tersedia,tidak_tersedia,dalam_penyelanggaraan'],
-            'section' => ['required', 'in:section_A,section_B,section_C'],
-            'packageDesc' => ['required', 'string'],
-            'packageImage' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            // MCDM fields
-            'proximity_rating' => 'required|in:high,medium,low',
-            'accessibility_rating' => 'required|in:excellent,good,poor',
-            'pathway_condition' => 'required|in:wide_paved,narrow_paved,unpaved',
-            'soil_condition' => 'required|in:excellent,good,poor',
-            'drainage_rating' => 'required|in:excellent,good,poor',
-            'shade_coverage' => 'required|in:full,partial,none'
-        ]);
-    
-        $package->update($validated);
-    
         if ($request->hasFile('packageImage')) {
             $path = $request->file('packageImage')->store('package_images', 'public');
             $package->packageImage = $path;
-            $package->save();
         }
-    
+
+        $package->save();
+
         return redirect()->route('admin.display.package')
-            ->with('success', 'Pusara dan kriteria MCDM berjaya dikemaskini!');
+            ->with('success', 'Pusara berjaya ditambah! Nombor Lot: ' . $pusaraNo);
     }
+
+   public function editPackage(String $id)
+{
+    $package = Package::findOrFail($id);
+    $sections = [
+        'section_A' => 'Area Pintu Masuk (A)',
+        'section_B' => 'Area Tandas dan stor (B)', 
+        'section_C' => 'Area pintu Belakang (C)'
+    ];
+    
+    $mcdmOptions = $this->getMcdmOptions();
+    
+    // Generate all possible lot numbers (A001-A100, B001-B100, C001-C100)
+    $allPossibleLots = [];
+    foreach (['A', 'B', 'C'] as $prefix) {
+        for ($i = 1; $i <= 100; $i++) {
+            $allPossibleLots[] = $prefix . str_pad($i, 3, '0', STR_PAD_LEFT);
+        }
+    }
+    
+    // Get used lot numbers excluding current package
+    $usedLots = Package::where('id', '!=', $id)
+                     ->pluck('pusaraNo')
+                     ->toArray();
+    
+    return view('ManageCatalogue.Admin.editPackage', compact(
+        'package',
+        'sections',
+        'mcdmOptions',
+        'allPossibleLots',
+        'usedLots'
+    ));
+}
+
+   public function updatePackage(Request $request, String $id)
+{
+    $package = Package::findOrFail($id);
+
+    $validated = $request->validate([
+        'status' => ['required', 'in:tersedia,tidak_tersedia,dalam_penyelanggaraan'],
+        'section' => ['required', 'in:section_A,section_B,section_C'],
+        'packageDesc' => ['required', 'string'],
+        'packageImage' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        'latitude' => 'nullable|numeric|between:-90,90',
+        'longitude' => 'nullable|numeric|between:-180,180',
+        // MCDM fields
+        'proximity_rating' => 'required|in:high,medium,low',
+        'accessibility_rating' => 'required|in:excellent,good,poor',
+        'pathway_condition' => 'required|in:wide_paved,narrow_paved,unpaved',
+        'soil_condition' => 'required|in:excellent,good,poor',
+        'drainage_rating' => 'required|in:excellent,good,poor',
+        'shade_coverage' => 'required|in:full,partial,none'
+    ]);
+
+    // Handle pusara number
+    if ($request->pusaraNo === 'manual') {
+        $request->validate([
+            'manualPusaraNo' => [
+                'required',
+                'string',
+                'max:4',
+                'regex:/^[A-Z][0-9]{3}$/',
+                'unique:packages,pusaraNo,'.$id
+            ]
+        ], [
+            'manualPusaraNo.regex' => 'Format nombor lot tidak sah. Sila gunakan format huruf besar diikuti 3 digit nombor (Contoh: A123, B045, Z999)',
+            'manualPusaraNo.unique' => 'Nombor lot ini sudah wujud dalam sistem'
+        ]);
+        
+        $validated['pusaraNo'] = strtoupper($request->manualPusaraNo);
+    } else {
+        $request->validate([
+            'pusaraNo' => ['required', 'string', 'max:255', 'unique:packages,pusaraNo,'.$id]
+        ]);
+        $validated['pusaraNo'] = $request->pusaraNo;
+    }
+
+    // Handle image removal
+    if ($request->has('removeImage')) {
+        if ($package->packageImage) {
+            \Storage::disk('public')->delete($package->packageImage);
+            $validated['packageImage'] = null;
+        }
+    }
+
+    // Handle new image upload
+    if ($request->hasFile('packageImage')) {
+        // Delete old image if exists
+        if ($package->packageImage) {
+            \Storage::disk('public')->delete($package->packageImage);
+        }
+        
+        $path = $request->file('packageImage')->store('package_images', 'public');
+        $validated['packageImage'] = $path;
+    }
+
+    $package->update($validated);
+
+    return redirect()->route('admin.display.package')
+        ->with('success', 'Pusara dan kriteria MCDM berjaya dikemaskini!');
+}
 
     public function destroyPackage($id)
     {

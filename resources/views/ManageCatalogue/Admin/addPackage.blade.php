@@ -17,18 +17,44 @@
             <form method="POST" action="{{ route('admin.store.package') }}" enctype="multipart/form-data">
                 @csrf
                 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="pusaraNo" class="form-label">Nombor Lot Pusara <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('pusaraNo') is-invalid @enderror" 
-                                   id="pusaraNo" name="pusaraNo" value="{{ old('pusaraNo') }}" required>
-                            @error('pusaraNo')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="pusaraNo" class="form-label">Nombor Lot Pusara <span class="text-danger">*</span></label>
+                                <select class="form-select @error('pusaraNo') is-invalid @enderror" 
+                                    id="pusaraNo" name="pusaraNo" required>
+                                    <option value="" disabled selected>Pilih Nombor Lot</option>
+                                     <option value="auto" {{ old('pusaraNo') == 'auto' ? 'selected' : '' }}>
+                                        Auto Generate ({{ $nextAvailable['A'] }}/{{ $nextAvailable['B'] }}/{{ $nextAvailable['C'] }})
+                                    </option>
+                                    <option value="manual">Tambah Nombor Lot Manual</option>
+                                    @foreach($availableLots as $lot)
+                                        <option value="{{ $lot }}" {{ old('pusaraNo') == $lot ? 'selected' : '' }}>
+                                            {{ $lot }}
+                                        </option>
+                                    @endforeach                
+                                </select>
+                                @error('pusaraNo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
-                    
+
+                        <!-- Manual Input Box (Hidden by default) -->
+                       <div class="col-md-6" id="manualPusaraNoContainer" style="display: none;">
+                            <div class="mb-3">
+                                <label for="manualPusaraNo" class="form-label">Nombor Lot Manual <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('manualPusaraNo') is-invalid @enderror" 
+                                    id="manualPusaraNo" name="manualPusaraNo" value="{{ old('manualPusaraNo') }}"
+                                    pattern="[A-Z][0-9]{3}" title="Format: Huruf Besar diikuti 3 digit nombor (Contoh: A123, B045, Z999)"
+                                    oninput="this.value = this.value.toUpperCase()">
+                                @error('manualPusaraNo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Format: Huruf Besar diikuti 3 digit nombor (Contoh: A123, B045, Z999)</small>
+                            </div>
+                        </div>
+                                    
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="section" class="form-label">Kawasan <span class="text-danger">*</span></label>
@@ -63,17 +89,6 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="packageImage" class="form-label">Gambar Pusara</label>
-                            <input type="file" class="form-control @error('packageImage') is-invalid @enderror" 
-                                   id="packageImage" name="packageImage" accept="image/*">
-                            @error('packageImage')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
 
                 <div class="mb-4">
                     <label for="packageDesc" class="form-label">Keterangan Pusara <span class="text-danger">*</span></label>
@@ -201,15 +216,37 @@
 </div>
 @endsection
 
-<!-- Add this script at the bottom of the file to enable map selection -->
 @section('scripts')
 <script>
-    // You can integrate with Google Maps or Leaflet here to allow selecting coordinates on a map
-    // This is a basic implementation that would need to be expanded
-    function initMap() {
-        // Map initialization code would go here
-        // When user clicks on map, update the latitude/longitude fields
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const pusaraNoSelect = document.getElementById('pusaraNo');
+        const manualContainer = document.getElementById('manualPusaraNoContainer');
+        const manualInput = document.getElementById('manualPusaraNo');
+        
+        function handlePusaraNoChange() {
+            if (pusaraNoSelect.value === 'manual') {
+                manualContainer.style.display = 'block';
+                manualInput.setAttribute('required', 'required');
+                // Clear any auto-generated value
+                if (pusaraNoSelect.querySelector('option[value="auto"]').selected) {
+                    pusaraNoSelect.querySelector('option[value=""]').selected = true;
+                }
+            } else {
+                manualContainer.style.display = 'none';
+                manualInput.removeAttribute('required');
+            }
+        }
+        
+        pusaraNoSelect.addEventListener('change', handlePusaraNoChange);
+        
+        // Initialize on page load
+        handlePusaraNoChange();
+        
+        // Also handle form validation errors
+        @if(old('pusaraNo') === 'manual')
+            manualContainer.style.display = 'block';
+            manualInput.setAttribute('required', 'required');
+        @endif
+    });
 </script>
-<!-- Include your map library of choice -->
 @endsection
