@@ -25,7 +25,7 @@
                                     id="pusaraNo" name="pusaraNo" required>
                                     <option value="" disabled selected>Pilih Nombor Lot</option>
                                      <option value="auto" {{ old('pusaraNo') == 'auto' ? 'selected' : '' }}>
-                                        Auto Generate ({{ $nextAvailable['A'] }}/{{ $nextAvailable['B'] }}/{{ $nextAvailable['C'] }})
+                                        Jana Kod ({{ $nextAvailable['A'] }}/{{ $nextAvailable['B'] }}/{{ $nextAvailable['C'] }})
                                     </option>
                                     <option value="manual">Tambah Nombor Lot Manual</option>
                                     @foreach($availableLots as $lot)
@@ -55,15 +55,21 @@
                             </div>
                         </div>
                                     
-                    <div class="col-md-6">
+                   <div class="col-md-6">
                         <div class="mb-3">
                             <label for="section" class="form-label">Kawasan <span class="text-danger">*</span></label>
                             <select class="form-select @error('section') is-invalid @enderror" 
                                     id="section" name="section" required>
                                 <option value="" disabled selected>Pilih Kawasan</option>
-                                <option value="section_A" {{ old('section') == 'section_A' ? 'selected' : '' }}>Area Pintu Masuk (Kawasan A)</option>
-                                <option value="section_B" {{ old('section') == 'section_B' ? 'selected' : '' }}>Area pintu Belakang(Kawasan B)</option>
-                                <option value="section_C" {{ old('section') == 'section_C' ? 'selected' : '' }}>Area Tandas dan stor (Kawasan C)</option>
+                                <option value="section_A" {{ old('section') == 'section_A' ? 'selected' : '' }}>
+                                    Area Pintu Masuk (A)
+                                </option>
+                                <option value="section_B" {{ old('section') == 'section_B' ? 'selected' : '' }}>
+                                    Area Tandas dan stor (B)
+                                </option>
+                                <option value="section_C" {{ old('section') == 'section_C' ? 'selected' : '' }}>
+                                    Area pintu Belakang (C)
+                                </option>
                             </select>
                             @error('section')
                                 <div class="invalid-feedback">{{ $message }}</div>

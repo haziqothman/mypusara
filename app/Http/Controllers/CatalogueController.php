@@ -12,7 +12,7 @@ class CatalogueController extends Controller
      * ADMIN FUNCTIONS
      */
 
-     public function displayManagePackage(Request $request)
+  public function displayManagePackage(Request $request)
     {
         $packageQuery = Package::with(['bookings' => function($query) {
             $query->where('status', '!=', 'cancelled');
@@ -20,19 +20,42 @@ class CatalogueController extends Controller
         
         $search = $request->input('search');
         $filter = $request->input('filter');
-    
+        $statusFilter = $request->input('status_filter');
+        
         // Searching
         if ($search) {
             $packageQuery->where('pusaraNo', 'like', "%$search%");
         }
-    
+        
         // Handle area filter
         if ($filter && $filter !== 'all') {
             $packageQuery->where('section', $filter);
         }
-    
+        
+        // Handle status filter
+        if ($statusFilter) {
+            if ($statusFilter === 'booked') {
+                $packageQuery->whereHas('bookings', function($q) {
+                    $q->where('status', 'confirmed');
+                });
+            } elseif ($statusFilter === 'pending') {
+                $packageQuery->whereHas('bookings', function($q) {
+                    $q->where('status', 'pending');
+                });
+            } else {
+                $packageQuery->where('status', $statusFilter);
+            }
+        }
+        
         $package = $packageQuery->paginate(6);
-    
+        
+        // Append all parameters to pagination links
+        $package->appends([
+            'filter' => $request->filter,
+            'search' => $request->search,
+            'status_filter' => $request->status_filter
+        ]);
+        
         return view('ManageCatalogue.Admin.packageList', ['package' => $package]);
     }
    public function createPackage()
@@ -292,7 +315,7 @@ class CatalogueController extends Controller
      * CUSTOMER FUNCTIONS
      */
 
-    public function displayPackage(Request $request)
+   public function displayPackage(Request $request)
     {
         $packageQuery = Package::where('status', 'tersedia');
         $search = $request->input('search');
@@ -306,7 +329,7 @@ class CatalogueController extends Controller
             $packageQuery->where('section', $filter);
         }
         
-        $package = $packageQuery->paginate(12);
+        $package = $packageQuery->get();
         return view('ManageCatalogue.Customer.packageList', compact('package'));
     }
 

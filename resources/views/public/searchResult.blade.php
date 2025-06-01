@@ -2,13 +2,19 @@
 
 @section('content')
 <style>
-    #map {
+    #map-container {
         min-height: 500px;
         border-radius: 8px;
         height: 500px;
         width: 100%;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        background-color: #e9ecef; /* Fallback color */
+        background-color: #e9ecef;
+        display: none;
+    }
+
+    #map {
+        height: 100%;
+        width: 100%;
     }
 
     .view-map {
@@ -25,6 +31,7 @@
         background: #f8f9fa;
         border-top: 1px solid #dee2e6;
         border-radius: 0 0 8px 8px;
+        display: none;
     }
 
     .coordinate-display {
@@ -75,6 +82,66 @@
         padding: 20px;
         text-align: center;
         color: #dc3545;
+    }
+    
+    .gm-link {
+        display: inline-block;
+        margin-top: 8px;
+        color: #1a73e8;
+        text-decoration: none;
+    }
+    
+    .gm-link:hover {
+        text-decoration: underline;
+    }
+    
+    .gm-link i {
+        margin-right: 5px;
+    }
+    
+    .map-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        background-color: #f8f9fa;
+        color: #6c757d;
+        font-size: 1.2rem;
+    }
+    
+    .boundary-info {
+        margin-top: 10px;
+        padding: 8px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+    
+    .visual-guide {
+        display: flex;
+        margin-top: 10px;
+        gap: 15px;
+    }
+    
+    .visual-item {
+        display: flex;
+        align-items: center;
+    }
+    
+    .point-indicator {
+        width: 16px;
+        height: 16px;
+        background-color: red;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+    
+    .box-indicator {
+        width: 16px;
+        height: 16px;
+        border: 2px solid red;
+        background-color: rgba(255, 0, 0, 0.1);
+        margin-right: 5px;
     }
 </style>
 
@@ -128,7 +195,6 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <!-- @if($booking->package && $booking->package->latitude && $booking->package->longitude) -->
                                         <button class="btn btn-sm btn-info view-map" 
                                             data-lat="{{ $booking->package->latitude }}"
                                             data-lng="{{ $booking->package->longitude }}"
@@ -136,9 +202,6 @@
                                             data-nama="{{ $booking->nama_simati }}">
                                             <i class="fas fa-map-marker-alt me-1"></i> Peta
                                         </button>
-                                        <!-- @else
-                                        <span class="text-muted">Tiada peta</span>
-                                        @endif -->
                                     </td>
                                 </tr>
                                 @endforeach
@@ -156,16 +219,26 @@
                                 <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Lokasi Pusara</h5>
                             </div>
                             <div class="card-body p-0" style="height: 500px;">
-                                <div id="map">
-                                    <div class="map-error d-none">
-                                        <div>
-                                            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                                            <h5>Gagal memuat peta</h5>
-                                            <p>Sila semak sambungan internet anda atau cuba lagi nanti.</p>
+                                <div class="map-placeholder">
+                                    <div>
+                                        <i class="fas fa-map-marked-alt fa-3x mb-3"></i>
+                                        <p>Klik butang "Peta" untuk melihat lokasi</p>
+                                    </div>
+                                </div>
+                                
+                                <div id="map-container">
+                                    <div id="map">
+                                        <div class="map-error d-none">
+                                            <div>
+                                                <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                                                <h5>Gagal memuat peta</h5>
+                                                <p>Sila semak sambungan internet anda atau cuba lagi nanti.</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="coordinate-info" class="p-3 bg-light border-top" style="display: none;">
+                                
+                                <div id="coordinate-info" class="p-3 bg-light border-top">
                                     <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Maklumat Pusara</h6>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -187,6 +260,17 @@
                                             <p id="info-lng" class="text-monospace">-</p>
                                         </div>
                                     </div>
+                                    <div id="gmaps-link-container" class="mt-3"></div>
+                                    <div class="visual-guide">
+                                        <div class="visual-item">
+                                            <div class="point-indicator"></div>
+                                            <span>Lokasi tepat</span>
+                                        </div>
+                                        <div class="visual-item">
+                                            <div class="box-indicator"></div>
+                                            <span>Kawasan (10m × 10m)</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -197,37 +281,15 @@
     </div>
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYgT3HCi6sbVEnmaCT3x65vRR41PjQK50&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQxsM5lTtMzAEgzBz3X3SL1Gp7BDmubTc&callback=initMap" async defer></script>
 <script>
     let map, activeInfoWindow, markers = [];
+    let mapInitialized = false;
+    let plotBoundary = null;
 
     function initMap() {
-     console.log('hello');
-        try {
-            // Initialize the map
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 3.1390, lng: 101.6869 }, // Default to Kuala Lumpur
-                zoom: 12,
-                gestureHandling: 'cooperative',
-                mapTypeControl: true,
-                streetViewControl: false,
-                fullscreenControl: true
-            });
-            
-            // Set up event listeners for view buttons
-            setupViewButtons();
-
-            // Automatically show the first marker if there are any
-            const firstButton = document.querySelector('.view-map');
-            if (firstButton) {
-                setTimeout(() => {
-                    firstButton.click();
-                }, 500);
-            }
-        } catch (error) {
-            console.error('Error initializing map:', error);
-            document.querySelector('.map-error').classList.remove('d-none');
-        }
+        mapInitialized = true;
+        console.log('Google Maps API loaded');
     }
 
     function clearMarkers() {
@@ -235,10 +297,132 @@
             marker.setMap(null);
         }
         markers = [];
+        
+        if (plotBoundary) {
+            plotBoundary.setMap(null);
+            plotBoundary = null;
+        }
+    }
+
+    function showMap(lat, lng, pusaraNo, namaSimati) {
+        document.querySelector('.map-placeholder').style.display = 'none';
+        document.getElementById('map-container').style.display = 'block';
+        document.getElementById('coordinate-info').style.display = 'block';
+        
+        if (!map) {
+            try {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: lat, lng: lng },
+                    zoom: 19,
+                    gestureHandling: 'cooperative',
+                    mapTypeControl: true,
+                    streetViewControl: false,
+                    fullscreenControl: true
+                });
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                document.querySelector('.map-error').classList.remove('d-none');
+                return;
+            }
+        }
+
+        clearMarkers();
+
+        const gravePosition = { lat: lat, lng: lng };
+        
+        // Create 10m × 10m boundary box
+        const boundarySize = 0.00009; // ~10 meters in degrees
+        const boundaryCoords = [
+            { lat: lat + boundarySize, lng: lng - boundarySize },
+            { lat: lat + boundarySize, lng: lng + boundarySize },
+            { lat: lat - boundarySize, lng: lng + boundarySize },
+            { lat: lat - boundarySize, lng: lng - boundarySize },
+            { lat: lat + boundarySize, lng: lng - boundarySize }
+        ];
+        
+        // Create plot boundary
+        plotBoundary = new google.maps.Polygon({
+            paths: boundaryCoords,
+            strokeColor: "#FF0000",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#FF0000",
+            fillOpacity: 0.1,
+            map: map,
+            zIndex: 1
+        });
+        
+        // Create grave marker
+        const graveMarker = new google.maps.Marker({
+            position: gravePosition,
+            map: map,
+            label: {
+                text: pusaraNo,
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 'bold'
+            },
+            icon: {
+                url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                scaledSize: new google.maps.Size(40, 40)
+            },
+            title: `Pusara ${pusaraNo} - ${namaSimati}`,
+            zIndex: 2
+        });
+        markers.push(graveMarker);
+
+        const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <div style="min-width: 200px;">
+                    <h6 style="margin-bottom: 10px; color: #007bff;">Pusara ${pusaraNo}</h6>
+                    <div style="display: flex; gap: 15px; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 16px; height: 16px; background-color: red; border-radius: 50%; margin-right: 5px;"></div>
+                            <span>Lokasi tepat</span>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 16px; height: 16px; border: 2px solid red; margin-right: 5px; background-color: rgba(255,0,0,0.1);"></div>
+                            <span>Kawasan pusara</span>
+                        </div>
+                    </div>
+                    <p style="margin-bottom: 5px;"><strong>Nama:</strong> ${namaSimati}</p>
+                    <p style="margin-bottom: 5px;"><strong>Koordinat:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
+                    <a href="${gmapsUrl}" target="_blank" class="gm-link">
+                        <i class="fas fa-external-link-alt"></i> Buka di Google Maps
+                    </a>
+                </div>
+            `
+        });
+
+        graveMarker.addListener('click', () => {
+            if (activeInfoWindow) activeInfoWindow.close();
+            infoWindow.open(map, graveMarker);
+            activeInfoWindow = infoWindow;
+        });
+
+        infoWindow.open(map, graveMarker);
+        activeInfoWindow = infoWindow;
+
+        document.getElementById('info-pusara').textContent = pusaraNo;
+        document.getElementById('info-nama').textContent = namaSimati;
+        document.getElementById('info-lat').textContent = lat.toFixed(6);
+        document.getElementById('info-lng').textContent = lng.toFixed(6);
+        
+        document.getElementById('gmaps-link-container').innerHTML = `
+            <a href="${gmapsUrl}" target="_blank" class="gm-link">
+                <i class="fas fa-external-link-alt"></i> Buka lokasi ini di Google Maps
+            </a>
+        `;
+
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(gravePosition);
+        boundaryCoords.forEach(coord => bounds.extend(coord));
+        map.fitBounds(bounds);
     }
 
     function setupViewButtons() {
-        console.log('Setting up view buttons');
         document.querySelectorAll('.view-map').forEach(button => {
             button.addEventListener('click', function() {
                 const lat = parseFloat(this.dataset.lat);
@@ -247,72 +431,24 @@
                 const namaSimati = this.dataset.nama;
 
                 if (!isNaN(lat) && !isNaN(lng)) {
-                    clearMarkers();
-
-                    const position = { lat, lng };
-                    const marker = new google.maps.Marker({
-                        position: position,
-                        map: map,
-                        label: {
-                            text: pusaraNo,
-                            color: 'white',
-                            fontSize: '14px',
-                            fontWeight: 'bold'
-                        },
-                        icon: {
-                            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                            scaledSize: new google.maps.Size(40, 40)
-                        },
-                        title: `Pusara ${pusaraNo} - ${namaSimati}`
-                    });
-                    markers.push(marker);
-
-                    const infoWindow = new google.maps.InfoWindow({
-                        content: `
-                            <div style="min-width: 200px;">
-                                <h6 style="margin-bottom: 10px; color: #007bff;">Pusara ${pusaraNo}</h6>
-                                <p style="margin-bottom: 5px;"><strong>Nama Si Mati:</strong> ${namaSimati}</p>
-                                <p style="margin-bottom: 5px;"><strong>Latitude:</strong> ${lat.toFixed(6)}</p>
-                                <p style="margin-bottom: 0;"><strong>Longitude:</strong> ${lng.toFixed(6)}</p>
-                            </div>
-                        `
-                    });
-
-                    marker.addListener('click', () => {
-                        if (activeInfoWindow) {
-                            activeInfoWindow.close();
-                        }
-                        infoWindow.open(map, marker);
-                        activeInfoWindow = infoWindow;
-                    });
-
-                    infoWindow.open(map, marker);
-                    activeInfoWindow = infoWindow;
-
-                    // Show coordinate info box
-                    document.getElementById('coordinate-info').style.display = 'block';
-                    document.getElementById('info-pusara').textContent = pusaraNo;
-                    document.getElementById('info-nama').textContent = namaSimati;
-                    document.getElementById('info-lat').textContent = lat.toFixed(6);
-                    document.getElementById('info-lng').textContent = lng.toFixed(6);
-
-                    map.setCenter(position);
-                    map.setZoom(18);
+                    showMap(lat, lng, pusaraNo, namaSimati);
                 } else {
                     console.error('Invalid coordinates:', lat, lng);
+                    alert('Koordinat tidak valid untuk pusara ini');
                 }
             });
         });
     }
 
-    // Fallback in case the Google Maps API fails to load
-    window.addEventListener('load', function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        setupViewButtons();
+        
         setTimeout(() => {
-            if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            if (!mapInitialized) {
                 console.error('Google Maps API failed to load');
                 document.querySelector('.map-error').classList.remove('d-none');
             }
-        }, 3000); // Give it 3 seconds to load
+        }, 3000);
     });
 </script>
 @endsection

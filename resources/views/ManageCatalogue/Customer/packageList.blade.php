@@ -148,94 +148,105 @@
 
             {{-- Visual Partitions --}}
             <div class="cemetery-partitions">
-                {{-- Section A: Pintu Masuk (Left) --}}
-                <div class="partition partition-a" id="section-a" data-section="section_A">
-                    <div class="section-header">
-                        <h6 class="section-title">
-                            <i class="fas fa-door-open me-2"></i> Kawasan Pintu Masuk
-                        </h6>
-                    </div>
-                    <div class="grave-grid">
-                        @foreach ($package as $item)
-                            @if($item->section == 'section_A')
-                                <div class="grave-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Pusara {{ $item->pusaraNo }}">
-                                    @if($item->isAvailable())
-                                        <a href="{{ route('customer.create.booking', $item->id) }}" class="grave-link">
-                                            <div class="grave-number">{{ $item->pusaraNo }}</div>
-                                            <div class="grave-status available">
-                                                <i class="fas fa-check-circle"></i>
-                                            </div>
-                                        </a>
-                                    @else
-                                        <div class="grave-number">{{ $item->pusaraNo }}</div>
-                                        <div class="grave-status booked">
-                                            <i class="fas fa-times-circle"></i>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
+             {{-- Section A: Pintu Masuk (Left) --}}
+            <div class="partition partition-a" id="section-a" data-section="section_A">
+                <div class="section-header">
+                    <h6 class="section-title">
+                        <i class="fas fa-door-open me-2"></i> Kawasan Pintu Masuk
+                    </h6>
                 </div>
-
-                {{-- Section C: Pintu Belakang (Right) --}}
-                <div class="partition partition-c" id="section-c" data-section="section_C">
-                    <div class="section-header">
-                        <h6 class="section-title">
-                            <i class="fas fa-door-closed me-2"></i> Kawasan Pintu Belakang
-                        </h6>
-                    </div>
-                    <div class="grave-grid">
-                        @foreach ($package as $item)
-                            @if($item->section == 'section_C')
-                                <div class="grave-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Pusara {{ $item->pusaraNo }}">
-                                    @if($item->isAvailable())
-                                        <a href="{{ route('customer.create.booking', $item->id) }}" class="grave-link">
-                                            <div class="grave-number">{{ $item->pusaraNo }}</div>
-                                            <div class="grave-status available">
-                                                <i class="fas fa-check-circle"></i>
-                                            </div>
-                                        </a>
-                                    @else
+                <div class="grave-grid">
+                    @forelse ($package as $item)
+                        @if($item->section == 'section_A')
+                            <div class="grave-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Pusara {{ $item->pusaraNo }}">
+                                @if($item->isAvailable())
+                                    <a href="{{ route('customer.create.booking', $item->id) }}" class="grave-link">
                                         <div class="grave-number">{{ $item->pusaraNo }}</div>
-                                        <div class="grave-status booked">
-                                            <i class="fas fa-times-circle"></i>
+                                        <div class="grave-status available">
+                                            <i class="fas fa-check-circle"></i>
                                         </div>
-                                    @endif
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
+                                    </a>
+                                @else
+                                    <div class="grave-number">{{ $item->pusaraNo }}</div>
+                                    <div class="grave-status booked">
+                                        <i class="fas fa-times-circle"></i>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    @empty
+                        <div class="empty-section-message">
+                            Tiada pusara tersedia dalam bahagian ini
+                        </div>
+                    @endforelse
                 </div>
+            </div>
 
-                {{-- Section B: Tandas & Stor (Bottom - Full Width) --}}
-                <div class="partition partition-b" id="section-b" data-section="section_B">
-                    <div class="section-header">
-                        <h6 class="section-title">
-                            <i class="fas fa-store me-2"></i> Kawasan Tandas & Stor
-                        </h6>
-                    </div>
-                    <div class="grave-grid">
-                        @foreach ($package as $item)
-                            @if($item->section == 'section_B')
-                                <div class="grave-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Pusara {{ $item->pusaraNo }}">
-                                    @if($item->isAvailable())
-                                        <a href="{{ route('customer.create.booking', $item->id) }}" class="grave-link">
-                                            <div class="grave-number">{{ $item->pusaraNo }}</div>
-                                            <div class="grave-status available">
-                                                <i class="fas fa-check-circle"></i>
-                                            </div>
-                                        </a>
-                                    @else
+            {{-- Section C: Pintu Belakang (Right) --}}
+            <div class="partition partition-c" id="section-c" data-section="section_C">
+                <div class="section-header">
+                    <h6 class="section-title">
+                        <i class="fas fa-door-closed me-2"></i> Kawasan Pintu Belakang
+                    </h6>
+                </div>
+                <div class="grave-grid">
+                    @forelse ($package as $item)
+                        @if($item->section == 'section_C')
+                            <div class="grave-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Pusara {{ $item->pusaraNo }}">
+                                @if($item->isAvailable())
+                                    <a href="{{ route('customer.create.booking', $item->id) }}" class="grave-link">
                                         <div class="grave-number">{{ $item->pusaraNo }}</div>
-                                        <div class="grave-status booked">
-                                            <i class="fas fa-times-circle"></i>
+                                        <div class="grave-status available">
+                                            <i class="fas fa-check-circle"></i>
                                         </div>
-                                    @endif
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
+                                    </a>
+                                @else
+                                    <div class="grave-number">{{ $item->pusaraNo }}</div>
+                                    <div class="grave-status booked">
+                                        <i class="fas fa-times-circle"></i>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    @empty
+                        <div class="empty-section-message">
+                            Tiada pusara tersedia dalam bahagian ini
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Section B: Tandas & Stor (Bottom - Full Width) --}}
+            <div class="partition partition-b" id="section-b" data-section="section_B">
+                <div class="section-header">
+                    <h6 class="section-title">
+                        <i class="fas fa-store me-2"></i> Kawasan Tandas & Stor
+                    </h6>
+                </div>
+                <div class="grave-grid">
+                    @forelse ($package as $item)
+                        @if($item->section == 'section_B')
+                            <div class="grave-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Pusara {{ $item->pusaraNo }}">
+                                @if($item->isAvailable())
+                                    <a href="{{ route('customer.create.booking', $item->id) }}" class="grave-link">
+                                        <div class="grave-number">{{ $item->pusaraNo }}</div>
+                                        <div class="grave-status available">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </a>
+                                @else
+                                    <div class="grave-number">{{ $item->pusaraNo }}</div>
+                                    <div class="grave-status booked">
+                                        <i class="fas fa-times-circle"></i>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    @empty
+                        <div class="empty-section-message">
+                            Tiada pusara tersedia dalam bahagian ini
+                        </div>
+                    @endforelse
                 </div>
             </div>
 
@@ -254,16 +265,26 @@
             @endif
         </div>
     </div>
+</div> {{-- Close container-fluid --}}
 
-    {{-- Pagination --}}
-    @if($package->hasPages())
-    <div class="d-flex justify-content-center mt-5">
-        <nav aria-label="Page navigation">
-            {{ $package->links() }}
-        </nav>
+{{-- Footer --}}
+<!-- <footer class="footer text-white py-4 mt-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0 small">&copy; {{ date('Y') }} MyPusara. Hak Cipta Terpelihara.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <div class="social-links">
+                    <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
     </div>
-    @endif
-</div>
+</footer> -->
 
 <style>
     /* Color Scheme */
@@ -282,6 +303,28 @@
         --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
         --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
         --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        --primary-dark: #3a56c8;
+    }
+
+    /* Main Content Container */
+    .container-fluid.py-4 {
+        padding-bottom: 100px !important;
+        min-height: calc(100vh - 100px);
+        position: relative;
+    }
+
+    /* Footer Styles */
+    .footer {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        width: 100%;
+        margin-top: -50px;
+        position: relative;
+        z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+
+    .footer a:hover {
+        color: rgba(255,255,255,0.8) !important;
     }
 
     /* Compact Legend Styles */
@@ -537,28 +580,41 @@
         align-items: center;
     }
 
-    /* Grave Grid */
+   /* Update the grave-grid styles */
     .grave-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-        gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 1rem;
+    min-height: 200px; /* Minimum height for empty sections */
+    align-items: stretch; /* Add this to make items stretch to same height */
+}
+
+    .partition:empty::after {
+    content: "Tiada pusara tersedia dalam bahagian ini";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: #6c757d;
+    font-style: italic;
     }
 
+
     /* Grave Item */
-    .grave-item {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 0.75rem;
-        border-radius: 8px;
-        background: white;
-        box-shadow: var(--shadow-sm);
-        transition: all 0.3s;
-        text-decoration: none;
-        color: inherit;
-        min-height: 80px;
-        overflow: hidden;
+   .grave-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem; /* Increased padding */
+    border-radius: 8px;
+    background: white;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s;
+    text-decoration: none;
+    color: inherit;
+    min-height: 100px; /* Increased minimum height */
+    overflow: hidden;
     }
 
     .grave-item::before {
@@ -592,28 +648,29 @@
         box-shadow: var(--shadow-md);
     }
 
-    .grave-number {
-        font-weight: 700;
-        font-size: 1rem;
-        margin-top: 0.5rem;
-        z-index: 2;
-        color: #343a40;
-    }
+   .grave-number {
+    font-weight: 700;
+    font-size: 1.2rem; /* Slightly larger font */
+    margin-top: 0.5rem;
+    z-index: 2;
+    color: #343a40;
+   }
 
     .grave-status {
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        font-size: 0.8rem;
-        padding: 0.3rem;
-        border-radius: 50%;
-        width: 22px;
-        height: 22px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 3;
+    position: absolute;
+    bottom: 12px; /* Adjusted position */
+    right: 12px; /* Adjusted position */
+    font-size: 1rem; /* Larger icon */
+    padding: 0.3rem;
+    border-radius: 50%;
+    width: 26px; /* Larger circle */
+    height: 26px; /* Larger circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
     }
+
 
     .available {
         background-color: rgba(46, 204, 113, 0.15);
@@ -665,12 +722,6 @@
     }
 
     /* Responsive Adjustments */
-    @media (max-width: 1200px) {
-        .grave-grid {
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-        }
-    }
-
     @media (max-width: 992px) {
         .cemetery-partitions {
             grid-template-areas:
@@ -697,6 +748,14 @@
     }
 
     @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-bottom: 120px !important;
+        }
+        
+        .footer {
+            margin-top: -70px;
+        }
+        
         .filter-link {
             padding: 0.5rem 1rem !important;
         }
@@ -723,6 +782,14 @@
     }
 
     @media (max-width: 576px) {
+        .container-fluid.py-4 {
+            padding-bottom: 140px !important;
+        }
+        
+        .footer {
+            margin-top: -90px;
+        }
+        
         .cemetery-layout-container {
             padding: 1.5rem;
         }

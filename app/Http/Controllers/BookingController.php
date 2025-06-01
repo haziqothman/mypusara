@@ -221,26 +221,6 @@ class BookingController extends Controller
 
    public function update(Request $request, Booking $booking)
 {
-    // $booking = Booking::findOrFail($id);
-
-    // $validated = $request->validate([
-    //     'customerName' => 'required|string|max:255',
-    //     'no_mykad' => 'required|string|max:20',
-    //     'customerEmail' => 'required|email|max:255',
-    //     'contactNumber' => 'required|string|max:20',
-    //     'jantina_simati' => 'required|in:Lelaki,Perempuan',
-    //     'area' => 'required|string|max:100',
-    //     'nama_simati' => 'required|string|max:255',
-    //     'no_mykad_simati' => 'required|string|max:20',
-    //     'no_sijil_kematian' => 'required|string|max:20',
-    //     'waris_address' => 'required|string|max:255',
-    //     'notes' => 'nullable|string|max:500',
-    //     'eventDate' => 'required|date|after_or_equal:today',
-    //     'eventTime' => 'required|date_format:H:i',
-    //     'eventLocation' => 'required|string|max:255',
-    //     'death_certificate_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-    // ]);
-
         function makeDevFormValidator(array $data, array $rules): array
     {
         $validator = Validator::make($data, $rules);
@@ -270,8 +250,15 @@ class BookingController extends Controller
         'no_mykad_simati' => 'required|string|max:20',
         'no_sijil_kematian' => 'required|string|max:20',
         'waris_address' => 'required|string|max:255',
-        'notes' => 'nullable|string|max:500',
-        'eventDate' => 'required|date|after_or_equal:today',
+        'eventDate' => [
+            'required',
+            'date',
+            function ($attribute, $value, $fail) {
+                if (strtotime($value) < strtotime('today midnight')) {
+                    $fail('The event date field must be a date after or equal to today.');
+                }
+            }
+        ],
         'eventTime' => 'required|date_format:H:i:s',
         'eventLocation' => 'required|string|max:255',
         'death_certificate_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'

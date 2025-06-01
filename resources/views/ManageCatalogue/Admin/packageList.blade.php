@@ -41,23 +41,48 @@
             </div>
         </div>
         <div class="card-body">
+            {{-- Status Filter --}}
+            <div class="mb-4">
+                <label class="form-label small text-muted mb-1 d-block">Status Makam</label>
+                <div class="btn-group btn-group-sm w-100" role="group">
+                    <a href="{{ route('admin.display.package', array_merge(request()->query(), ['status_filter' => ''])) }}" 
+                       class="btn {{ !request('status_filter') ? 'btn-primary' : 'btn-outline-primary' }}">
+                        <i class="fas fa-layer-group me-1"></i> Semua Status
+                    </a>
+                    <a href="{{ route('admin.display.package', array_merge(request()->query(), ['status_filter' => 'tersedia'])) }}" 
+                       class="btn {{ request('status_filter') == 'tersedia' ? 'btn-primary' : 'btn-outline-primary' }}">
+                        <i class="fas fa-check-circle me-1"></i> Tersedia
+                    </a>
+                    <a href="{{ route('admin.display.package', array_merge(request()->query(), ['status_filter' => 'booked'])) }}" 
+                       class="btn {{ request('status_filter') == 'booked' ? 'btn-primary' : 'btn-outline-primary' }}">
+                        <i class="fas fa-check-double me-1"></i> Disahkan
+                    </a>
+                    <a href="{{ route('admin.display.package', array_merge(request()->query(), ['status_filter' => 'dalam_penyelanggaraan'])) }}" 
+                       class="btn {{ request('status_filter') == 'dalam_penyelanggaraan' ? 'btn-primary' : 'btn-outline-primary' }}">
+                        <i class="fas fa-tools me-1"></i> Penyelenggaraan
+                    </a>
+                </div>
+            </div>
+
+            {{-- Area Filter --}}
             <div class="text-center mb-3">
+                <label class="form-label small text-muted mb-1 d-block">Kawasan Makam</label>
                 <div class="btn-group btn-group-sm" role="group">
-                    <a href="{{ route('admin.display.package', ['filter' => 'all']) }}" 
+                    <a href="{{ route('admin.display.package', array_merge(request()->query(), ['filter' => 'all'])) }}" 
                        class="btn {{ request('filter') == 'all' || !request('filter') ? 'btn-primary' : 'btn-outline-primary' }}">
                         <i class="fas fa-layer-group me-1"></i> Semua
                     </a>
-                    <a href="{{ route('admin.display.package', ['filter' => 'section_A']) }}" 
+                    <a href="{{ route('admin.display.package', array_merge(request()->query(), ['filter' => 'section_A'])) }}" 
                        class="btn {{ request('filter') == 'section_A' ? 'btn-primary' : 'btn-outline-primary' }}">
                        <i class="fas fa-door-open me-1"></i> Pintu Masuk (A)
                     </a>
-                    <a href="{{ route('admin.display.package', ['filter' => 'section_C']) }}" 
-                       class="btn {{ request('filter') == 'section_C' ? 'btn-primary' : 'btn-outline-primary' }}">
-                        <i class="fas fa-door-closed me-1"></i> Pintu Belakang (B)
-                    </a>
-                    <a href="{{ route('admin.display.package', ['filter' => 'section_B']) }}" 
+                    <a href="{{ route('admin.display.package', array_merge(request()->query(), ['filter' => 'section_B'])) }}" 
                        class="btn {{ request('filter') == 'section_B' ? 'btn-primary' : 'btn-outline-primary' }}">
-                        <i class="fas fa-toilet me-1"></i> Tandas & Stor (C)
+                        <i class="fas fa-toilet me-1"></i> Pintu Belakang (B)
+                    </a>
+                    <a href="{{ route('admin.display.package', array_merge(request()->query(), ['filter' => 'section_C'])) }}" 
+                       class="btn {{ request('filter') == 'section_C' ? 'btn-primary' : 'btn-outline-primary' }}">
+                        <i class="fas fa-door-closed me-1"></i> Tandas & Stor (C)
                     </a>
                 </div>
             </div>
@@ -67,10 +92,16 @@
                 <form action="{{ route('admin.display.package') }}" method="GET" class="flex-grow-1 w-100">
                     <div class="input-group input-group-merged shadow-sm">
                         <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" class="form-control border-start-0 ps-1" placeholder="Cari nombor pusara..." name="search" 
-                               value="{{ request('search') }}">
+                        <input type="text" class="form-control border-start-0 ps-1" placeholder="Cari nombor pusara..." 
+                               name="search" value="{{ request('search') }}">
+                        @if(request('filter'))
+                            <input type="hidden" name="filter" value="{{ request('filter') }}">
+                        @endif
+                        @if(request('status_filter'))
+                            <input type="hidden" name="status_filter" value="{{ request('status_filter') }}">
+                        @endif
                         <button class="btn btn-primary px-3" type="submit">
-                             <i class="fas fa-search me-1"></i> Cari
+                            <i class="fas fa-search me-1"></i> Cari
                         </button>
                     </div>
                 </form>
@@ -87,8 +118,8 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         @foreach ($package as $item)
             @php
-                 $hasActiveBookings = $item->bookings->where('status', '!=', 'cancelled')->count() > 0;
-                 $bookingStatus = $hasActiveBookings ? $item->bookings->firstWhere('status', '!=', 'cancelled')->status : null;
+                $hasActiveBookings = $item->bookings->where('status', '!=', 'cancelled')->count() > 0;
+                $bookingStatus = $hasActiveBookings ? $item->bookings->firstWhere('status', '!=', 'cancelled')->status : null;
             @endphp
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 overflow-hidden hover-lift">
@@ -119,17 +150,12 @@
                     </div>
 
                     {{-- Booking Status --}}
-                    {{-- Booking Warning --}}
                     @if($hasActiveBookings)
                     <div class="alert alert-warning alert-dismissible fade show m-3 mb-0 py-2" role="alert">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             <div>
                                 <strong>Pusara ini telah ditempah!</strong>
-                                <!-- @foreach($item->bookings as $booking)
-                                    Waris: {{ $booking->warisName }} (No. Tel: {{ $booking->warisPhone }})
-                                    @if(!$loop->last) | @endif
-                                @endforeach -->
                             </div>
                             <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -252,7 +278,9 @@
                     </li>
                 @else
                     <li class="page-item">
-                        <a class="page-link rounded-start-pill" href="{{ $package->previousPageUrl() }}" aria-label="Previous">
+                        <a class="page-link rounded-start-pill" 
+                        href="{{ $package->previousPageUrl() }}&filter={{ request('filter') }}&status_filter={{ request('status_filter') }}" 
+                        aria-label="Previous">
                             <i class="fas fa-angle-left"></i>
                         </a>
                     </li>
@@ -261,14 +289,19 @@
                 {{-- Pagination Elements --}}
                 @foreach ($package->links()->elements[0] as $page => $url)
                     <li class="page-item {{ $package->currentPage() == $page ? 'active' : '' }}">
-                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        <a class="page-link" 
+                        href="{{ $url }}&filter={{ request('filter') }}&status_filter={{ request('status_filter') }}">
+                        {{ $page }}
+                        </a>
                     </li>
                 @endforeach
 
                 {{-- Next Page Link --}}
                 @if ($package->hasMorePages())
                     <li class="page-item">
-                        <a class="page-link rounded-end-pill" href="{{ $package->nextPageUrl() }}" aria-label="Next">
+                        <a class="page-link rounded-end-pill" 
+                        href="{{ $package->nextPageUrl() }}&filter={{ request('filter') }}&status_filter={{ request('status_filter') }}" 
+                        aria-label="Next">
                             <i class="fas fa-angle-right"></i>
                         </a>
                     </li>
@@ -318,16 +351,12 @@
 
 <script>
 function populateModal(item) {
-    // Set the grave identifier in the modal
     document.getElementById('graveIdentifier').textContent = `Pusara ${item.pusaraNo} - ${item.section.replace('_', ' ')}`;
-    
-    // Update the delete form's action URL
     const deleteUrl = `{{ route('admin.package.destroy', '') }}/${item.id}`;
     const deleteForm = document.getElementById('deleteForm');
     deleteForm.action = deleteUrl;
 }
 
-// Initialize tooltips
 document.addEventListener('DOMContentLoaded', function() {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -413,6 +442,17 @@ document.addEventListener('DOMContentLoaded', function() {
     .btn-outline-danger:hover {
         background: var(--danger-gradient);
         color: white !important;
+    }
+    
+    /* Status filter buttons */
+    .btn-group-sm .btn {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    /* Filter labels */
+    .form-label {
+        font-weight: 500;
     }
 </style>
 @endsection

@@ -210,7 +210,17 @@
       </div>
     </div>
     <hr class="mt-4 mb-4" style="border-color: rgba(255,255,255,0.1);">
-    <p class="mb-0 small">&copy; 2025 myPusara. Hak Cipta Terpelihara.</p>
+     <div class="col-md-6 text-center text-md-start">
+        <p class="mb-0 small">&copy; {{ date('Y') }} MyPusara. Hak Cipta Terpelihara.</p>
+    </div>
+    <div class="col-md-6 text-center text-md-end">
+        <div class="social-links">
+            <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+    </div>
   </div>
 </footer>
 

@@ -47,7 +47,7 @@
                 </ul>
                 <li class="nav-item">
                      @if (Auth::check() && Auth::user()->type == 'admin')
-                        <a class="nav-link" href="{{ route('admin.display.package') }}"> Tambah Pusara</a>
+                        <a class="nav-link" href="{{ route('admin.display.package') }}"> Pengurusan Pusara</a>
                     @elseif (Auth::check() && Auth:: user()->type === 'customer')
                         <a class="nav-link" href="{{ route('customer.pusara.selection') }}"> Pusara</a>
                     @endif
@@ -70,14 +70,14 @@
 
             <div class="dropdown-menu dropdown-menu-end col-1" aria-labelledby="navbarDropdown">
                 @if (Auth::check() && Auth::user()->type === 'admin')
-                    <a href="{{ route('adminProfile.show') }}" class="dropdown-item"> Profile</a>
+                    <a href="{{ route('adminProfile.show') }}" class="dropdown-item"> Profil</a>
                 @elseif (Auth::check() && Auth::user()->type === 'customer')
-                    <a href="{{ route('customerProfile.show') }}" class="dropdown-item"> Profile</a>
+                    <a href="{{ route('customerProfile.show') }}" class="dropdown-item"> Profil</a>
                 @endif
                 <a class="dropdown-item" href="{{ route('logout') }}"
                     onclick="event.preventDefault();
                                     document.getElementById('logout-form').submit();">
-                    {{ __('Logout') }}
+                    {{ __('Log Keluar') }}
                 </a>
 
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -96,7 +96,9 @@
                     <use xlink:href="#bootstrap"></use>
                 </svg>
             </a>
-            <span class="mb-3 mb-md-0 text-muted">© 2025 Mypusara, Inc</span>
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0 small">&copy; {{ date('Y') }} MyPusara. Hak Cipta Terpelihara.</p>
+            </div>
         </div>
 
         <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
