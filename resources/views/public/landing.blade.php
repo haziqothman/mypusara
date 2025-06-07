@@ -132,7 +132,7 @@
     <form action="{{ route('search.bookings') }}" method="GET" class="w-100">
         <div class="input-group shadow-sm">
             <input type="text" class="form-control form-control-lg" 
-                   placeholder="Carian Pusara (Nama Si Mati/No Sijil Kematian/No Pusara)..." 
+                   placeholder="Carian Pusara (Nama Si Mati/No Pusara/No khairat Kematian)..." 
                    name="search" required>
             <button class="btn btn-primary btn-lg" type="submit">
                 <i class="fas fa-search"></i> Carian

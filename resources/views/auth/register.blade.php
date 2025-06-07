@@ -60,7 +60,7 @@
       padding: 1rem 1rem;
       border-radius: 8px;
       border: 1px solid #e0e0e0;
-      padding-right: 2.5rem; /* Add padding for the eye icon */
+      padding-right: 2.5rem;
     }
 
     .form-control:focus {
@@ -114,46 +114,91 @@
       opacity: 1;
     }
 
-    .password-strength {
-      height: 5px;
-      background: #e9ecef;
-      border-radius: 3px;
+    /* Password Strength Meter */
+    .password-strength-container {
       margin-top: 0.5rem;
-      overflow: hidden;
     }
 
     .strength-meter {
-      height: 100%;
-      width: 0;
-      transition: width 0.3s ease, background 0.3s ease;
-    }
-
-    .password-requirements {
-      font-size: 0.8rem;
-      color: #6c757d;
-      margin-top: 0.5rem;
-    }
-
-    .requirement {
       display: flex;
       align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .strength-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+      margin-right: 0.5rem;
+    }
+
+    .strength-value {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .strength-bar {
+      width: 100%;
+      height: 0.5rem;
+      background-color: #e5e7eb;
+      border-radius: 0.25rem;
+      overflow: hidden;
+    }
+
+    .strength-progress {
+      height: 100%;
+      width: 0;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    /* Password Requirements */
+    .requirements-box {
+      background-color: #f0f9ff;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .requirements-title {
+      display: flex;
+      align-items: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 0.5rem;
+    }
+
+    .requirements-title i {
+      margin-right: 0.5rem;
+    }
+
+    .requirements-list {
+      list-style-type: none;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    .requirement-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.8125rem;
       margin-bottom: 0.25rem;
     }
 
-    .requirement i {
+    .requirement-item i {
       margin-right: 0.5rem;
       font-size: 0.7rem;
     }
 
-    .valid {
-      color: #28a745;
+    .requirement-met {
+      color: #16a34a;
     }
 
-    .invalid {
-      color: #dc3545;
+    .requirement-unmet {
+      color: #6b7280;
     }
 
-    /* Password toggle button styles */
+    /* Password toggle button */
     .password-toggle-btn {
       position: absolute;
       right: 10px;
@@ -162,11 +207,25 @@
       background: none;
       border: none;
       color: #6c757d;
+      cursor: pointer;
       z-index: 5;
     }
 
     .form-floating {
       position: relative;
+    }
+
+    /* Match error styling */
+    .password-match-error {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    /* Alert styling */
+    .alert {
+      border-radius: 0.5rem;
     }
   </style>
 </head>
@@ -190,14 +249,19 @@
           </div>
         @endif
 
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" id="registrationForm">
           @csrf
+
+          <!-- Honeypot field for spam protection -->
+          <input type="text" name="honeypot" style="display:none;" value="">
 
           <div class="mb-3">
             <div class="form-floating">
               <input type="text" class="form-control @error('name') is-invalid @enderror" 
                      id="name" name="name" placeholder="Full Name" 
-                     value="{{ old('name') }}" required autofocus>
+                     value="{{ old('name') }}" required autofocus
+                     pattern="^[a-zA-Z\s]{2,50}$"
+                     title="Name should be 2-50 alphabetic characters">
               <label for="name">Nama Penuh</label>
               @error('name')
                 <div class="invalid-feedback">
@@ -211,7 +275,8 @@
             <div class="form-floating">
               <input type="email" class="form-control @error('email') is-invalid @enderror" 
                      id="email" name="email" placeholder="name@example.com" 
-                     value="{{ old('email') }}" required>
+                     value="{{ old('email') }}" required
+                     pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
               <label for="email">Alamat Email</label>
               @error('email')
                 <div class="invalid-feedback">
@@ -225,30 +290,58 @@
             <div class="form-floating">
               <input type="password" class="form-control @error('password') is-invalid @enderror" 
                      id="password" name="password" placeholder="Password" required
-                     oninput="checkPasswordStrength(this.value)">
+                     oninput="checkPasswordStrength(this.value)"
+                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!#%*?&])[A-Za-z\d@$!#%*?&]{8,}$">
               <label for="password">Kata Laluan</label>
-              <button type="button" class="password-toggle-btn" onclick="togglePassword()">
+              <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password')">
                 <i class="fas fa-eye" id="togglePasswordIcon"></i>
               </button>
-              <div class="password-strength">
-                <div class="strength-meter" id="strength-meter"></div>
-              </div>
-              <div class="password-requirements">
-                <div class="requirement" id="length-req">
-                  <i class="fas fa-circle"></i> Minimum 8 aksara
-                </div>
-                <div class="requirement" id="number-req">
-                  <i class="fas fa-circle"></i> Mengandungi nombor
-                </div>
-                <div class="requirement" id="special-req">
-                  <i class="fas fa-circle"></i> Mengandungi aksara khas
-                </div>
-              </div>
               @error('password')
                 <div class="invalid-feedback">
                   <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
                 </div>
               @enderror
+            </div>
+            
+            <!-- Password Strength Meter -->
+            <div class="password-strength-container">
+              <div class="strength-meter">
+                <span class="strength-label">Kekuatan Kata Laluan:</span>
+                <span class="strength-value" id="passwordStrengthText">Lemah</span>
+              </div>
+              <div class="strength-bar">
+                <div class="strength-progress" id="passwordStrengthBar"></div>
+              </div>
+            </div>
+            
+            <!-- Password Requirements -->
+            <div class="requirements-box">
+              <div class="requirements-title">
+                <i class="fas fa-info-circle"></i>
+                <span>Keperluan Kata Laluan</span>
+              </div>
+              <ul class="requirements-list">
+                <li class="requirement-item" id="reqLength">
+                  <i class="fas fa-circle requirement-unmet"></i>
+                  <span>Minimum 8 aksara</span>
+                </li>
+                <li class="requirement-item" id="reqUpper">
+                  <i class="fas fa-circle requirement-unmet"></i>
+                  <span>Sekurang-kurangnya satu huruf besar</span>
+                </li>
+                <li class="requirement-item" id="reqLower">
+                  <i class="fas fa-circle requirement-unmet"></i>
+                  <span>Sekurang-kurangnya satu huruf kecil</span>
+                </li>
+                <li class="requirement-item" id="reqNumber">
+                  <i class="fas fa-circle requirement-unmet"></i>
+                  <span>Sekurang-kurangnya satu nombor</span>
+                </li>
+                <li class="requirement-item" id="reqSpecial">
+                  <i class="fas fa-circle requirement-unmet"></i>
+                  <span>Sekurang-kurangnya satu aksara khas (@$!#%*?&)</span>
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -256,11 +349,15 @@
             <div class="form-floating">
               <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" 
                      id="password_confirmation" name="password_confirmation" 
-                     placeholder="Confirm Password" required>
+                     placeholder="Confirm Password" required
+                     oninput="checkPasswordMatch()">
               <label for="password_confirmation">Sahkan Kata Laluan</label>
-              <button type="button" class="password-toggle-btn" onclick="toggleConfirmPassword()">
+              <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password_confirmation')">
                 <i class="fas fa-eye" id="toggleConfirmPasswordIcon"></i>
               </button>
+              <div class="password-match-error" id="passwordMatchError">
+                <i class="fas fa-exclamation-circle me-1"></i> Kata laluan tidak sepadan
+              </div>
               @error('password_confirmation')
                 <div class="invalid-feedback">
                   <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
@@ -283,83 +380,119 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Toggle password visibility
+    function togglePasswordVisibility(fieldId) {
+      const field = document.getElementById(fieldId);
+      const icon = document.getElementById(fieldId === 'password' ? 'togglePasswordIcon' : 'toggleConfirmPasswordIcon');
+      
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+    
+    // Check password match
+    function checkPasswordMatch() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('password_confirmation').value;
+      const errorElement = document.getElementById('passwordMatchError');
+      
+      if (password !== confirmPassword && confirmPassword !== '') {
+        errorElement.style.display = 'block';
+        return false;
+      } else {
+        errorElement.style.display = 'none';
+        return true;
+      }
+    }
+    
+    // Password strength checker
     function checkPasswordStrength(password) {
-      const strengthMeter = document.getElementById('strength-meter');
-      const lengthReq = document.getElementById('length-req');
-      const numberReq = document.getElementById('number-req');
-      const specialReq = document.getElementById('special-req');
-
-      strengthMeter.style.width = '0%';
-      strengthMeter.style.backgroundColor = '#dc3545';
-
+      const strengthBar = document.getElementById('passwordStrengthBar');
+      const strengthText = document.getElementById('passwordStrengthText');
+      
+      // Reset requirements
+      document.getElementById('reqLength').querySelector('i').className = 'fas fa-circle requirement-unmet';
+      document.getElementById('reqUpper').querySelector('i').className = 'fas fa-circle requirement-unmet';
+      document.getElementById('reqLower').querySelector('i').className = 'fas fa-circle requirement-unmet';
+      document.getElementById('reqNumber').querySelector('i').className = 'fas fa-circle requirement-unmet';
+      document.getElementById('reqSpecial').querySelector('i').className = 'fas fa-circle requirement-unmet';
+      
+      // Check requirements
       const hasLength = password.length >= 8;
-      const hasNumber = /\d/.test(password);
-      const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-      updateRequirement(lengthReq, hasLength);
-      updateRequirement(numberReq, hasNumber);
-      updateRequirement(specialReq, hasSpecial);
-
+      const hasUpper = /[A-Z]/.test(password);
+      const hasLower = /[a-z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSpecial = /[@$!#%*?&]/.test(password);
+      
+      // Update requirement indicators
+      if (hasLength) document.getElementById('reqLength').querySelector('i').className = 'fas fa-check-circle requirement-met';
+      if (hasUpper) document.getElementById('reqUpper').querySelector('i').className = 'fas fa-check-circle requirement-met';
+      if (hasLower) document.getElementById('reqLower').querySelector('i').className = 'fas fa-check-circle requirement-met';
+      if (hasNumber) document.getElementById('reqNumber').querySelector('i').className = 'fas fa-check-circle requirement-met';
+      if (hasSpecial) document.getElementById('reqSpecial').querySelector('i').className = 'fas fa-check-circle requirement-met';
+      
+      // Calculate strength
       let strength = 0;
-      if (hasLength) strength += 33;
-      if (hasNumber) strength += 33;
-      if (hasSpecial) strength += 34;
-
-      strengthMeter.style.width = strength + '%';
-
-      if (strength < 66) {
-        strengthMeter.style.backgroundColor = '#dc3545';
-      } else if (strength < 100) {
-        strengthMeter.style.backgroundColor = '#ffc107';
+      if (hasLength) strength += 20;
+      if (hasUpper) strength += 20;
+      if (hasLower) strength += 20;
+      if (hasNumber) strength += 20;
+      if (hasSpecial) strength += 20;
+      
+      // Update UI
+      strengthBar.style.width = strength + '%';
+      
+      if (strength < 40) {
+        strengthBar.style.backgroundColor = '#dc3545';
+        strengthText.textContent = 'Lemah';
+        strengthText.style.color = '#dc3545';
+      } else if (strength < 80) {
+        strengthBar.style.backgroundColor = '#ffc107';
+        strengthText.textContent = 'Sederhana';
+        strengthText.style.color = '#ffc107';
       } else {
-        strengthMeter.style.backgroundColor = '#28a745';
+        strengthBar.style.backgroundColor = '#28a745';
+        strengthText.textContent = 'Kuat';
+        strengthText.style.color = '#28a745';
       }
     }
-
-    function updateRequirement(element, isValid) {
-      const icon = element.querySelector('i');
-      if (isValid) {
-        icon.classList.remove('fa-circle');
-        icon.classList.add('fa-check-circle', 'valid');
-        element.classList.add('valid');
-        element.classList.remove('invalid');
-      } else {
-        icon.classList.remove('fa-check-circle', 'valid');
-        icon.classList.add('fa-circle');
-        element.classList.add('invalid');
-        element.classList.remove('valid');
+    
+    // Form submission handler
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+      // Honeypot check
+      const honeypot = document.querySelector('input[name="honeypot"]').value;
+      if (honeypot !== '') {
+        e.preventDefault();
+        return false;
       }
-    }
-
-    function togglePassword() {
-      const passwordInput = document.getElementById('password');
-      const icon = document.getElementById('togglePasswordIcon');
-
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        passwordInput.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
+      
+      // Check password match
+      if (!checkPasswordMatch()) {
+        e.preventDefault();
+        return false;
       }
-    }
-
-    function toggleConfirmPassword() {
-      const confirmPasswordInput = document.getElementById('password_confirmation');
-      const icon = document.getElementById('toggleConfirmPasswordIcon');
-
-      if (confirmPasswordInput.type === 'password') {
-        confirmPasswordInput.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        confirmPasswordInput.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
+      
+      return true;
+    });
+    
+    // Initialize password strength check if there's existing value
+    document.addEventListener('DOMContentLoaded', function() {
+      const passwordField = document.getElementById('password');
+      if (passwordField.value) {
+        checkPasswordStrength(passwordField.value);
       }
-    }
+      
+      // Check password match on load if there's a confirmation
+      if (document.getElementById('password_confirmation').value) {
+        checkPasswordMatch();
+      }
+    });
   </script>
 </body>
 </html>

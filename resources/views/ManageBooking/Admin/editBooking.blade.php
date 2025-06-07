@@ -10,7 +10,7 @@
                     <div class="card-header bg-primary text-white py-3">
                         <div class="d-flex align-items-center justify-content-between">
                             <h2 class="h5 mb-0">
-                                <i class="fas fa-calendar-edit me-2"></i> Kemaskini Tempahan @session('error') {{ $value }} @endsession
+                                <i class="fas fa-calendar-edit me-2"></i> Kemaskini Tempahan @session('error') {{ $value }} 
                                 @endsession
                             </h2>
                             <!-- <a href="{{ route('ManageBooking.Admin.dashboardBooking') }}" class="btn btn-sm btn-light">
@@ -130,7 +130,7 @@
                                     
                                     <!-- Death Certificate -->
                                     <div class="col-md-6">
-                                        <label for="no_sijil_kematian" class="form-label">No Sijil Kematian</label>
+                                        <label for="no_sijil_kematian" class="form-label">No Khairat Kematian</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-award"></i></span>
                                             <input type="text" id="no_sijil_kematian" name="no_sijil_kematian" 
