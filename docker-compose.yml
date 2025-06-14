@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - APP_ENV=local
+    depends_on:
+      - mysql
+    networks:
+      - mypusara-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx:/etc/nginx/conf.d
+    depends_on:
+      - laravel
+    networks:
+      - mypusara-network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: mypusara
+    ports:
+      - "3306:3306"
+    networks:
+      - mypusara-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8889:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: secret
+    depends_on:
+      - mysql
+    networks:
+      - mypusara-network
+
+networks:
+  mypusara-network:
+    driver: bridge
