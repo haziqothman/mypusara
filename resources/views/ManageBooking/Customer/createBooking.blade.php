@@ -250,143 +250,87 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ms.js"></script>
 
     <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] Form initialization started');
-    
-    // 1. Get form element with enhanced error checking
+ document.addEventListener('DOMContentLoaded', function() {
+    // 1. Get the form element
     const bookingForm = document.querySelector('form.needs-validation');
     if (!bookingForm) {
-        console.error('ERROR: Form element not found - check your HTML form has class "needs-validation"');
+        console.error('Form not found');
         return;
     }
 
-    // 2. Verify form attributes
-    console.log('[DEBUG] Form attributes:', {
-        action: bookingForm.action,
-        method: bookingForm.method,
-        enctype: bookingForm.enctype,
-        id: bookingForm.id
-    });
-
-    // 3. Initialize date pickers with error handling
+    // 2. Initialize date pickers (without problematic locale)
     try {
-        const datePicker = flatpickr("#eventDate", {
+        flatpickr("#eventDate", {
             dateFormat: "Y-m-d",
             minDate: "today",
             onChange: function(selectedDates) {
-                console.log('Date selected:', selectedDates[0]);
                 validateField(this.input);
             }
         });
-        console.log('Date picker initialized successfully');
     } catch (error) {
-        console.error('Failed to initialize date picker:', error);
+        console.error('Date picker error:', error);
     }
 
     try {
-        const timePicker = flatpickr("#eventTime", {
+        flatpickr("#eventTime", {
             enableTime: true,
             noCalendar: true,
             dateFormat: "H:i",
             time_24hr: true,
             onChange: function(selectedDates) {
-                console.log('Time selected:', selectedDates[0]);
                 validateField(this.input);
             }
         });
-        console.log('Time picker initialized successfully');
     } catch (error) {
-        console.error('Failed to initialize time picker:', error);
+        console.error('Time picker error:', error);
     }
 
-    // 4. Enhanced validation function
+    // 3. Field validation function
     const validateField = (field) => {
         const isValid = field.checkValidity();
-        console.log(`Field validation: ${field.name || field.id}`, {
-            valid: isValid,
-            value: field.value,
-            validationMessage: field.validationMessage
-        });
-
         field.classList.toggle('is-valid', isValid);
         field.classList.toggle('is-invalid', !isValid);
-        
         return isValid;
     };
 
-    // 5. Form submission handler with full debugging
+    // 4. Form submission handler
     bookingForm.addEventListener('submit', function(e) {
-        console.group('Form submission debug');
-        console.log('Submission intercepted at:', new Date().toISOString());
-        
-        // Debug: Log all form data
-        const formData = new FormData(bookingForm);
-        const formDataObj = Object.fromEntries(formData.entries());
-        console.log('Form data:', formDataObj);
-
         // Validate all fields
         let allValid = true;
-        bookingForm.querySelectorAll('input, select, textarea').forEach(field => {
-            if (!validateField(field)) {
-                allValid = false;
-            }
+        this.querySelectorAll('input, select, textarea').forEach(field => {
+            if (!validateField(field)) allValid = false;
         });
 
         if (!allValid) {
-            console.warn('Validation failed - preventing submission');
             e.preventDefault();
             e.stopPropagation();
             alert('Please complete all required fields correctly');
-        } else {
-            console.log('Validation passed - allowing submission');
-            
-            // TEMPORARY: For debugging only - prevent actual submission
-            console.warn('DEBUG MODE: Preventing actual submission');
-            e.preventDefault();
-            
-            // Simulate what would happen
-            console.log('Would submit to:', this.action);
-            console.log('With method:', this.method);
-            console.log('With data:', formDataObj);
-            
-            // In production, remove the e.preventDefault() above
         }
-        
-        console.groupEnd();
+        // If valid, allow normal form submission
     });
 
-    // 6. Real-time validation for all fields
+    // 5. Real-time validation
     bookingForm.querySelectorAll('input, select, textarea').forEach(field => {
         field.addEventListener('input', function() {
-            console.log(`Field changed: ${this.name || this.id}`, this.value);
             validateField(this);
         });
     });
 
-    // 7. Special file validation
+    // 6. File upload validation
     const fileInput = document.getElementById('death_certificate_image');
     if (fileInput) {
         fileInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                const file = this.files[0];
-                console.log('File selected:', {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type
-                });
-                
-                if (file.size > 2 * 1024 * 1024) {
-                    this.setCustomValidity('File must be smaller than 2MB');
-                    console.warn('File too large:', file.size);
-                } else {
-                    this.setCustomValidity('');
-                }
-                validateField(this);
+            if (this.files[0]?.size > 2 * 1024 * 1024) {
+                this.setCustomValidity('File must be smaller than 2MB');
+            } else {
+                this.setCustomValidity('');
             }
+            validateField(this);
         });
     }
 
-    console.log('Form initialization complete');
+    // Initial validation state
+    bookingForm.classList.add('was-validated');
 });
     </script>
 
