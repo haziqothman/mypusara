@@ -45,12 +45,12 @@ Route::middleware(['auth', 'user-access:customer'])->group(function () {
          */
         Route::get('/customer/dashboard', [BookingController::class, 'show'])->name('ManageBooking.Customer.dashboardBooking');
         Route::get('/booking/{id}/create', [BookingController::class, 'create'])->name('ManageBooking.Customer.createBooking');  
-        Route::get('/booking/{id}/store', [BookingController::class, 'store'])->name('ManageBooking.Customer.storeBooking');    
+        Route::post('/booking/{id}/store', [BookingController::class, 'store'])->name('ManageBooking.Customer.storeBooking');    
         Route::post('/customer/{id}/store-booking', [BookingController::class, 'store'])->name('customer.store.booking');
         Route::get('/customer/booking/{id}/edit', [BookingController::class, 'edit'])->name('ManageBooking.Customer.editBooking');
         Route::put('/customer/booking/{booking}', [BookingController::class, 'update'])->name('customer.update.booking');
        Route::get('/customer/cancel-booking/{id}', [BookingController::class, 'cancelBooking'])
-    ->name('customer.cancel.booking');
+         ->name('customer.cancel.booking');
         Route::get('/booking/{id}/create', [BookingController::class, 'create'])->name('customer.create.booking');
         // Route::get('/booking/{id}/create', [BookingController::class, 'create'])->name('customer.booking.create');
         Route::get('/booking/{id}/view', [BookingController::class, 'view'])->name('ManageBooking.Customer.viewBooking');

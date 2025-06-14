@@ -35,6 +35,8 @@ services:
       - "3306:3306"
     networks:
       - mypusara-network
+    volumes:
+      - mysql:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin
@@ -52,3 +54,8 @@ services:
 networks:
   mypusara-network:
     driver: bridge
+
+volumes:
+  laravel:
+  mysql:
+
