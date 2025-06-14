@@ -241,7 +241,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@section
     <!-- Include Flatpickr CSS -->
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
     <!-- Include Flatpickr JS -->
@@ -250,89 +250,143 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ms.js"></script>
 
     <script>
-   document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     console.log('[DEBUG] Form initialization started');
     
+    // 1. Get form element with enhanced error checking
     const bookingForm = document.querySelector('form.needs-validation');
-    
     if (!bookingForm) {
-        console.error('Form element not found');
+        console.error('ERROR: Form element not found - check your HTML form has class "needs-validation"');
         return;
     }
 
-    // 1. Initialize date pickers (without problematic locale)
+    // 2. Verify form attributes
+    console.log('[DEBUG] Form attributes:', {
+        action: bookingForm.action,
+        method: bookingForm.method,
+        enctype: bookingForm.enctype,
+        id: bookingForm.id
+    });
+
+    // 3. Initialize date pickers with error handling
     try {
-        // Date picker
-        flatpickr("#eventDate", {
+        const datePicker = flatpickr("#eventDate", {
             dateFormat: "Y-m-d",
             minDate: "today",
-            onChange: function(selectedDates, dateStr) {
+            onChange: function(selectedDates) {
+                console.log('Date selected:', selectedDates[0]);
                 validateField(this.input);
             }
         });
+        console.log('Date picker initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize date picker:', error);
+    }
 
-        // Time picker
-        flatpickr("#eventTime", {
+    try {
+        const timePicker = flatpickr("#eventTime", {
             enableTime: true,
             noCalendar: true,
             dateFormat: "H:i",
             time_24hr: true,
-            minuteIncrement: 15,
-            onChange: function(selectedDates, timeStr) {
+            onChange: function(selectedDates) {
+                console.log('Time selected:', selectedDates[0]);
                 validateField(this.input);
             }
         });
+        console.log('Time picker initialized successfully');
     } catch (error) {
-        console.error('Date picker initialization failed:', error);
+        console.error('Failed to initialize time picker:', error);
     }
 
-    // 2. Field validation function
+    // 4. Enhanced validation function
     const validateField = (field) => {
         const isValid = field.checkValidity();
+        console.log(`Field validation: ${field.name || field.id}`, {
+            valid: isValid,
+            value: field.value,
+            validationMessage: field.validationMessage
+        });
+
         field.classList.toggle('is-valid', isValid);
         field.classList.toggle('is-invalid', !isValid);
+        
         return isValid;
     };
 
-    // 3. Form submission handler
+    // 5. Form submission handler with full debugging
     bookingForm.addEventListener('submit', function(e) {
+        console.group('Form submission debug');
+        console.log('Submission intercepted at:', new Date().toISOString());
+        
+        // Debug: Log all form data
+        const formData = new FormData(bookingForm);
+        const formDataObj = Object.fromEntries(formData.entries());
+        console.log('Form data:', formDataObj);
+
         // Validate all fields
         let allValid = true;
-        this.querySelectorAll('input, select, textarea').forEach(field => {
-            if (!validateField(field)) allValid = false;
+        bookingForm.querySelectorAll('input, select, textarea').forEach(field => {
+            if (!validateField(field)) {
+                allValid = false;
+            }
         });
 
         if (!allValid) {
+            console.warn('Validation failed - preventing submission');
             e.preventDefault();
             e.stopPropagation();
-            alert('Please fill all required fields correctly');
-            return;
+            alert('Please complete all required fields correctly');
+        } else {
+            console.log('Validation passed - allowing submission');
+            
+            // TEMPORARY: For debugging only - prevent actual submission
+            console.warn('DEBUG MODE: Preventing actual submission');
+            e.preventDefault();
+            
+            // Simulate what would happen
+            console.log('Would submit to:', this.action);
+            console.log('With method:', this.method);
+            console.log('With data:', formDataObj);
+            
+            // In production, remove the e.preventDefault() above
         }
         
-        // If everything is valid, allow natural form submission
-        console.log('Form submitting via POST to:', this.action);
+        console.groupEnd();
     });
 
-    // 4. Real-time validation
+    // 6. Real-time validation for all fields
     bookingForm.querySelectorAll('input, select, textarea').forEach(field => {
-        field.addEventListener('input', () => validateField(field));
+        field.addEventListener('input', function() {
+            console.log(`Field changed: ${this.name || this.id}`, this.value);
+            validateField(this);
+        });
     });
 
-    // 5. File upload validation
+    // 7. Special file validation
     const fileInput = document.getElementById('death_certificate_image');
     if (fileInput) {
         fileInput.addEventListener('change', function() {
-            if (this.files[0]?.size > 2 * 1024 * 1024) {
-                this.setCustomValidity('File must be smaller than 2MB');
-            } else {
-                this.setCustomValidity('');
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                console.log('File selected:', {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                });
+                
+                if (file.size > 2 * 1024 * 1024) {
+                    this.setCustomValidity('File must be smaller than 2MB');
+                    console.warn('File too large:', file.size);
+                } else {
+                    this.setCustomValidity('');
+                }
+                validateField(this);
             }
-            validateField(this);
         });
     }
 
-    // Initial validation state
-    bookingForm.classList.add('was-validated');
+    console.log('Form initialization complete');
 });
     </script>
 
