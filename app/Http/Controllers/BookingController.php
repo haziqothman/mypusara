@@ -98,7 +98,7 @@ class BookingController extends Controller
         ]);
     }
 
-    public function store(Request $request, Package $package))
+    public function store(Request $request, Package $package)
     {
         $validated = $request->validate([
             'customerName' => 'required|string|max:255',
@@ -143,7 +143,7 @@ class BookingController extends Controller
             'eventTime' => $validated['eventTime'],
             'eventLocation' => $validated['eventLocation'],
             'user_id' => Auth::id(),
-            'packageId' => $id,
+            'packageId' => $package->id,
             'status' => 'pending',
             'death_certificate_image' => $validated['death_certificate_image'] ? $file_name : null,
         ]);
