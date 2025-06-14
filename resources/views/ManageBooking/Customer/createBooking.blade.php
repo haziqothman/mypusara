@@ -250,136 +250,89 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ms.js"></script>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] Starting form initialization');
+   document.addEventListener('DOMContentLoaded', function() {
+    console.log('[DEBUG] Form initialization started');
     
     const bookingForm = document.querySelector('form.needs-validation');
     
     if (!bookingForm) {
-        console.error('[ERROR] Form element not found');
+        console.error('Form element not found');
         return;
     }
 
-    // Debug: Verify form attributes
-    console.log('[DEBUG] Form attributes:', {
-        action: bookingForm.action,
-        method: bookingForm.method,
-        enctype: bookingForm.enctype
-    });
-
-    // 1. Initialize date/time pickers
+    // 1. Initialize date pickers (without problematic locale)
     try {
+        // Date picker
         flatpickr("#eventDate", {
             dateFormat: "Y-m-d",
             minDate: "today",
-            locale: "ms",
             onChange: function(selectedDates, dateStr) {
-                console.log('[DEBUG] Selected date:', dateStr);
                 validateField(this.input);
             }
         });
 
+        // Time picker
         flatpickr("#eventTime", {
             enableTime: true,
             noCalendar: true,
             dateFormat: "H:i",
             time_24hr: true,
             minuteIncrement: 15,
-            locale: "ms",
             onChange: function(selectedDates, timeStr) {
-                console.log('[DEBUG] Selected time:', timeStr);
                 validateField(this.input);
             }
         });
-        console.log('[DEBUG] Date/time pickers initialized');
     } catch (error) {
-        console.error('[ERROR] Date picker initialization failed:', error);
+        console.error('Date picker initialization failed:', error);
     }
 
     // 2. Field validation function
     const validateField = (field) => {
         const isValid = field.checkValidity();
-        console.log(`[VALIDATION] Field ${field.name || field.id}:`, 
-                   isValid ? 'VALID' : 'INVALID', 
-                   field.validationMessage);
-        
         field.classList.toggle('is-valid', isValid);
         field.classList.toggle('is-invalid', !isValid);
-        
         return isValid;
     };
 
-    // 3. Validate all fields
-    const validateAll = () => {
-        console.group('[VALIDATION] Validating all fields');
-        let allValid = true;
-        
-        bookingForm.querySelectorAll('input, select, textarea').forEach(field => {
-            if (!validateField(field)) {
-                allValid = false;
-            }
-        });
-        
-        console.groupEnd();
-        return allValid;
-    };
-
-    // 4. Form submission handler
+    // 3. Form submission handler
     bookingForm.addEventListener('submit', function(e) {
-        console.group('[SUBMISSION] Form submit event');
-        
-        // Debug: Log all form data
-        const formData = new FormData(bookingForm);
-        console.log('[DEBUG] Form data:', Object.fromEntries(formData));
-        
-        // Validate before submission
-        if (!validateAll()) {
-            console.warn('[SUBMISSION] Validation failed - preventing submit');
+        // Validate all fields
+        let allValid = true;
+        this.querySelectorAll('input, select, textarea').forEach(field => {
+            if (!validateField(field)) allValid = false;
+        });
+
+        if (!allValid) {
             e.preventDefault();
             e.stopPropagation();
-            console.groupEnd();
+            alert('Please fill all required fields correctly');
             return;
         }
         
-        console.log('[SUBMISSION] Validation passed - allowing submit');
-        
-        // For debugging only - prevent actual submission
-        // console.log('[DEBUG] Simulating submission to:', bookingForm.action);
-        // e.preventDefault();
-        // console.groupEnd();
-        // return;
-        
-        console.groupEnd();
+        // If everything is valid, allow natural form submission
+        console.log('Form submitting via POST to:', this.action);
     });
 
-    // 5. Real-time validation
+    // 4. Real-time validation
     bookingForm.querySelectorAll('input, select, textarea').forEach(field => {
-        field.addEventListener('input', () => {
-            console.log(`[INPUT] Field ${field.name || field.id} changed`);
-            validateField(field);
-        });
+        field.addEventListener('input', () => validateField(field));
     });
 
-    // 6. Special handling for file upload
+    // 5. File upload validation
     const fileInput = document.getElementById('death_certificate_image');
     if (fileInput) {
         fileInput.addEventListener('change', function() {
-            console.log('[FILE] Selected file:', this.files[0]?.name);
-            
             if (this.files[0]?.size > 2 * 1024 * 1024) {
-                this.setCustomValidity('File must be <2MB');
-                console.warn('[FILE] File too large');
+                this.setCustomValidity('File must be smaller than 2MB');
             } else {
                 this.setCustomValidity('');
-                console.log('[FILE] Valid file selected');
             }
             validateField(this);
         });
     }
 
-    // 7. Initial validation state
+    // Initial validation state
     bookingForm.classList.add('was-validated');
-    console.log('[DEBUG] Form initialization complete');
 });
     </script>
 
