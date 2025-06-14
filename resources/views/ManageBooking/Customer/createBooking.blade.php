@@ -241,7 +241,7 @@
 </div>
 @endsection
 
-@section
+@section('scripts')
     <!-- Include Flatpickr CSS -->
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
     <!-- Include Flatpickr JS -->
