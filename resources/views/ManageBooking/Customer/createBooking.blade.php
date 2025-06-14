@@ -34,7 +34,7 @@
 
         {{-- Form --}}
         <div class="card-body p-5">
-            <form method="POST" action="{{ url('customer/' .$package->id. '/store-booking') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <form method="POST" action="{{ url('customer/customer/' .$package->id. '/store-booking') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
                 @csrf
                 <input type="hidden" name="packageId" value="{{ $package->id }}">
 
