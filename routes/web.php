@@ -44,7 +44,7 @@ Route::middleware(['auth', 'user-access:customer'])->group(function () {
          * Manage Booking
          */
         Route::get('/customer/dashboard', [BookingController::class, 'show'])->name('ManageBooking.Customer.dashboardBooking');
-        Route::get('/booking/{id}/create', [BookingController::class, 'create'])->name('ManageBooking.Customer.createBooking');   
+        // Route::get('/booking/{id}/create', [BookingController::class, 'create'])->name('ManageBooking.Customer.createBooking');   
         Route::post('/booking/{id}/store-booking', [BookingController::class, 'store'])->name('customer.store.booking');
         Route::get('/customer/booking/{id}/edit', [BookingController::class, 'edit'])->name('ManageBooking.Customer.editBooking');
         Route::put('/customer/booking/{booking}', [BookingController::class, 'update'])->name('customer.update.booking');

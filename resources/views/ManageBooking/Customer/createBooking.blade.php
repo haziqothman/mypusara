@@ -34,7 +34,7 @@
 
         {{-- Form --}}
         <div class="card-body p-5">
-          <form method="POST" action="{{ route('customer.store.booking', auth()->user()->id) }}" enctype="multipart/form-data">
+           <form method="POST" action="{{ route('customer.store.booking', $package->id) }}" enctype="multipart/form-data" class="needs-validation" novalidate>
                 @csrf
                 <input type="hidden" name="packageId" value="{{ $package->id }}">
 
@@ -250,51 +250,85 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ms.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if the package is available when page loads
-            const packageStatus = "{{ $package->isAvailable() ? 'available' : 'unavailable' }}";
-            
-            if(packageStatus === 'unavailable') {
-                document.querySelector('form').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    alert('This grave is no longer available for booking');
-                    return false;
-                });
-            }
-            
-            // Initialize Flatpickr for the date
-            flatpickr("#eventDate", {
-                dateFormat: "Y-m-d",
-                minDate: "today",
-                locale: "ms", // Malay localization
-            });
-
-            // Initialize Flatpickr for the time
-            flatpickr("#eventTime", {
-                enableTime: true,
-                noCalendar: true,
-                dateFormat: "H:i",
-                time_24hr: true,
-                minuteIncrement: 15,
-                locale: "ms"
-            });
-
-            // Form validation
-            (function () {
-                'use strict'
-                var forms = document.querySelectorAll('.needs-validation')
-                Array.prototype.slice.call(forms)
-                    .forEach(function (form) {
-                        form.addEventListener('submit', function (event) {
-                            if (!form.checkValidity()) {
-                                event.preventDefault()
-                                event.stopPropagation()
-                            }
-                            form.classList.add('was-validated')
-                        }, false)
-                    })
-            })();
+       document.addEventListener('DOMContentLoaded', function() {
+    // Get the form element
+    const bookingForm = document.querySelector('form.needs-validation');
+    
+    if (bookingForm) {
+        // Initialize Flatpickr for date and time inputs
+        flatpickr("#eventDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            locale: "ms"
         });
+
+        flatpickr("#eventTime", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: true,
+            minuteIncrement: 15,
+            locale: "ms"
+        });
+
+        // Check package availability
+        const packageStatus = document.querySelector('form').dataset.packageStatus;
+        if (packageStatus === 'unavailable') {
+            bookingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('This grave is no longer available for booking');
+                return false;
+            });
+            return; // Exit if package is unavailable
+        }
+
+        // Form submission handler
+        bookingForm.addEventListener('submit', function(e) {
+            // Prevent default only if form is invalid
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Add Bootstrap's validation classes
+            this.classList.add('was-validated');
+
+            // If form is valid, you could add AJAX submission here
+            // But for Laravel, regular form submission is fine
+        });
+
+        // Add real-time validation as users fill the form
+        const validateField = (field) => {
+            if (field.checkValidity()) {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            } else {
+                field.classList.remove('is-valid');
+                field.classList.add('is-invalid');
+            }
+        };
+
+        // Add input event listeners for real-time validation
+        const inputs = bookingForm.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => validateField(input));
+        });
+
+        // Special handling for file input
+        const fileInput = bookingForm.querySelector('#death_certificate_image');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                const fileSize = this.files[0]?.size / 1024 / 1024; // in MB
+                if (fileSize > 2) {
+                    this.setCustomValidity('File size must be less than 2MB');
+                } else {
+                    this.setCustomValidity('');
+                }
+                validateField(this);
+            });
+        }
+    }
+});
     </script>
 
     <style>
