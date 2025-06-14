@@ -98,7 +98,7 @@ class BookingController extends Controller
         ]);
     }
 
-    public function store(Request $request, string $id)
+    public function store(Request $request, Package $package))
     {
         $validated = $request->validate([
             'customerName' => 'required|string|max:255',
