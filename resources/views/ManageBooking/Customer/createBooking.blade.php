@@ -250,158 +250,110 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ms.js"></script>
 
     <script>
-     document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] DOM fully loaded and parsed');
-    
-    // Get the form element
-    const bookingForm = document.querySelector('form.needs-validation');
-    
-    if (!bookingForm) {
-        console.error('[ERROR] Could not find form with class "needs-validation"');
-        return;
-    }
-
-    console.log('[DEBUG] Form element found:', bookingForm);
-    console.log('[DEBUG] Form action:', bookingForm.action);
-    console.log('[DEBUG] Form method:', bookingForm.method);
-
-    // Initialize Flatpickr for date and time inputs
-    try {
-        flatpickr("#eventDate", {
-            dateFormat: "Y-m-d",
-            minDate: "today",
-            locale: "ms",
-            onChange: function() {
-                console.log('[DEBUG] Date selected:', document.getElementById('eventDate').value);
-            }
-        });
-
-        flatpickr("#eventTime", {
-            enableTime: true,
-            noCalendar: true,
-            dateFormat: "H:i",
-            time_24hr: true,
-            minuteIncrement: 15,
-            locale: "ms",
-            onChange: function() {
-                console.log('[DEBUG] Time selected:', document.getElementById('eventTime').value);
-            }
-        });
-        console.log('[DEBUG] Flatpickr date/time pickers initialized');
-    } catch (error) {
-        console.error('[ERROR] Flatpickr initialization failed:', error);
-    }
-
-    // Check package availability
-    const packageStatus = bookingForm.dataset.packageStatus || 'available';
-    console.log('[DEBUG] Package status:', packageStatus);
-    
-    if (packageStatus === 'unavailable') {
-        console.warn('[WARNING] Package is unavailable - blocking form submission');
-        bookingForm.addEventListener('submit', function(e) {
-            console.log('[DEBUG] Attempted form submission while package is unavailable');
-            e.preventDefault();
-            alert('This grave is no longer available for booking');
-            return false;
-        });
-        return;
-    }
-
-    // Form validation function
-    const validateField = (field) => {
-        console.log(`[DEBUG] Validating field: ${field.name || field.id}`);
-        const isValid = field.checkValidity();
-        
-        if (isValid) {
-            field.classList.remove('is-invalid');
-            field.classList.add('is-valid');
-            console.log(`[VALID] Field ${field.name || field.id} is valid`);
-        } else {
-            field.classList.remove('is-valid');
-            field.classList.add('is-invalid');
-            console.warn(`[INVALID] Field ${field.name || field.id} is invalid`);
-            console.warn(`[INVALID] Validation message: ${field.validationMessage}`);
-        }
-        
-        return isValid;
-    };
-
-    // Add input event listeners for real-time validation
-    const inputs = bookingForm.querySelectorAll('input, select, textarea');
-    console.log(`[DEBUG] Found ${inputs.length} form fields to validate`);
-    
-    inputs.forEach(input => {
-        input.addEventListener('input', () => {
-            console.log(`[DEBUG] Input detected on field: ${input.name || input.id}`);
-            validateField(input);
-        });
-    });
-
-    // Special handling for file input
-    const fileInput = bookingForm.querySelector('#death_certificate_image');
-    if (fileInput) {
-        fileInput.addEventListener('change', function() {
-            console.log('[DEBUG] File input changed');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[DEBUG] DOM fully loaded and parsed');
             
-            if (this.files.length > 0) {
-                const file = this.files[0];
-                const fileSize = file.size / 1024 / 1024; // in MB
-                console.log(`[DEBUG] Selected file: ${file.name}, Size: ${fileSize.toFixed(2)}MB`);
-                
-                if (fileSize > 2) {
-                    this.setCustomValidity('File size must be less than 2MB');
-                    console.warn('[INVALID] File size exceeds 2MB limit');
-                } else {
-                    this.setCustomValidity('');
-                    console.log('[VALID] File size is acceptable');
+            const bookingForm = document.querySelector('form.needs-validation');
+            
+            if (!bookingForm) {
+                console.error('[ERROR] Form not found');
+                return;
+            }
+
+            console.log('[DEBUG] Form method before any JS:', bookingForm.method);
+
+            // Initialize Flatpickr
+            flatpickr("#eventDate", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                locale: "ms",
+                onChange: function() {
+                    console.log('[DEBUG] Date selected:', this.input.value);
+                    validateField(this.input);
                 }
-                validateField(this);
+            });
+
+            flatpickr("#eventTime", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                minuteIncrement: 15,
+                locale: "ms",
+                onChange: function() {
+                    console.log('[DEBUG] Time selected:', this.input.value);
+                    validateField(this.input);
+                }
+            });
+
+            // Enhanced validation function
+            const validateField = (field) => {
+                field.classList.add('was-validated');
+                const isValid = field.checkValidity();
+                
+                if (isValid) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    console.warn(`Validation failed for ${field.name}:`, field.validationMessage);
+                }
+                return isValid;
+            };
+
+            // Validate all fields
+            const validateAll = () => {
+                let isValid = true;
+                bookingForm.querySelectorAll('input, select, textarea').forEach(field => {
+                    if (!validateField(field)) isValid = false;
+                });
+                return isValid;
+            };
+
+            // Form submission handler
+            bookingForm.addEventListener('submit', function(e) {
+                console.log('[DEBUG] Form submission triggered');
+                console.log('[DEBUG] Current form method:', this.method);
+                
+                if (!validateAll()) {
+                    console.warn('[SUBMISSION] Validation failed - preventing submit');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+
+                // Debug: Uncomment to see what would be submitted
+                // e.preventDefault();
+                // const formData = new FormData(this);
+                // console.log('[DEBUG] Form data:', Object.fromEntries(formData));
+                // console.log('[DEBUG] Would submit to:', this.action);
+                // return;
+
+                console.log('[SUBMISSION] All valid - proceeding with submission');
+            });
+
+            // Real-time validation
+            bookingForm.querySelectorAll('input, select, textarea').forEach(input => {
+                input.addEventListener('input', () => validateField(input));
+            });
+
+            // Special file validation
+            const fileInput = document.getElementById('death_certificate_image');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    if (this.files[0]?.size > 2 * 1024 * 1024) {
+                        this.setCustomValidity('File must be <2MB');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                    validateField(this);
+                });
             }
+
+            // Debug: Force show all validation messages
+            bookingForm.classList.add('was-validated');
         });
-    }
-
-    // Form submission handler
-    bookingForm.addEventListener('submit', function(e) {
-        console.group('[DEBUG] Form submission initiated');
-        console.log('[DEBUG] Form data:', new FormData(bookingForm));
-        
-        // Validate all fields
-        let formIsValid = true;
-        inputs.forEach(input => {
-            if (!validateField(input)) {
-                formIsValid = false;
-            }
-        });
-
-        if (!formIsValid) {
-            console.warn('[VALIDATION] Form validation failed - preventing submission');
-            e.preventDefault();
-            e.stopPropagation();
-        } else {
-            console.log('[VALIDATION] Form is valid - proceeding with submission');
-            
-            // For debugging - uncomment to prevent actual submission
-            // e.preventDefault();
-            // console.log('[DEBUG] Submission prevented for testing');
-            // console.log('[DEBUG] Would submit to:', bookingForm.action);
-            // console.log('[DEBUG] With method:', bookingForm.method);
-            // console.log('[DEBUG] Form data:', new FormData(bookingForm));
-        }
-
-        // Add Bootstrap's validation classes
-        this.classList.add('was-validated');
-        console.groupEnd();
-    });
-
-    // Debugging: Log all form fields and their initial values
-    console.group('[DEBUG] Form fields initial state');
-    inputs.forEach(input => {
-        console.log(`Field: ${input.name || input.id}, Type: ${input.type}, Value: ${input.value}`);
-    });
-    console.groupEnd();
-
-    console.log('[DEBUG] Form initialization complete');
-});
     </script>
 
     <style>
