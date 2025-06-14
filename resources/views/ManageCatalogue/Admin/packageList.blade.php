@@ -55,7 +55,7 @@
                     </a>
                     <a href="{{ route('admin.display.package', array_merge(request()->query(), ['status_filter' => 'booked'])) }}" 
                        class="btn {{ request('status_filter') == 'booked' ? 'btn-primary' : 'btn-outline-primary' }}">
-                        <i class="fas fa-check-double me-1"></i> Disahkan
+                        <i class="fas fa-check-double me-1"></i> Telah Ditempah
                     </a>
                     <a href="{{ route('admin.display.package', array_merge(request()->query(), ['status_filter' => 'dalam_penyelanggaraan'])) }}" 
                        class="btn {{ request('status_filter') == 'dalam_penyelanggaraan' ? 'btn-primary' : 'btn-outline-primary' }}">
@@ -180,27 +180,49 @@
                             <h6 class="text-uppercase text-xs fw-bold text-primary mb-3">
                                 <i class="fas fa-clipboard-list me-1"></i> Kriteria Makam
                             </h6>
-                            <ul class="list-unstyled mb-0">
+                             <ul class="list-unstyled mb-0">
                                 @php
                                     $criteria = [
-                                        'proximity_rating' => 'Kedekatan',
-                                        'accessibility_rating' => 'Kemudahan Akses',
-                                        'pathway_condition' => 'Keadaan Laluan',
-                                        'soil_condition' => 'Keadaan Tanah',
-                                        'drainage_rating' => 'Sistem Saliran',
-                                        'shade_coverage' => 'Teduhan'
+                                        'proximity_rating' => [
+                                            'label' => 'Kedekatan',
+                                            'values' => ['low' => 20, 'medium' => 60, 'high' => 100]
+                                        ],
+                                        'accessibility_rating' => [
+                                            'label' => 'Kemudahan Akses',
+                                            'values' => ['poor' => 30, 'good' => 70, 'excellent' => 100]
+                                        ],
+                                        'pathway_condition' => [
+                                            'label' => 'Keadaan Laluan',
+                                            'values' => ['unpaved' => 20, 'narrow_paved' => 60, 'wide_paved' => 100]
+                                        ],
+                                        'soil_condition' => [
+                                            'label' => 'Keadaan Tanah',
+                                            'values' => ['poor' => 30, 'good' => 70, 'excellent' => 100]
+                                        ],
+                                        'drainage_rating' => [
+                                            'label' => 'Sistem Saliran',
+                                            'values' => ['poor' => 20, 'good' => 60, 'excellent' => 100]
+                                        ],
+                                        'shade_coverage' => [
+                                            'label' => 'Teduhan',
+                                            'values' => ['none' => 20, 'partial' => 60, 'full' => 100]
+                                        ]
                                     ];
                                 @endphp
                                 
-                                @foreach($criteria as $field => $label)
+                                @foreach($criteria as $field => $data)
                                 <li class="mb-2">
                                     <div class="d-flex justify-content-between mb-1">
-                                        <span class="text-sm">{{ $label }}:</span>
-                                        <span class="fw-bold text-dark">{{ $item->$field }}</span>
+                                        <span class="text-sm">{{ $data['label'] }}:</span>
+                                        <span class="fw-bold text-dark">{{ $data['values'][$item->$field] }}%</span>
                                     </div>
                                     <div class="progress" style="height: 6px;">
                                         <div class="progress-bar bg-gradient-primary" role="progressbar" 
-                                            style="width: {{ (int)$item->$field * 20 }}%"></div>
+                                            style="width: {{ $data['values'][$item->$field] }}%" 
+                                            aria-valuenow="{{ $data['values'][$item->$field] }}" 
+                                            aria-valuemin="0" 
+                                            aria-valuemax="100">
+                                        </div>
                                     </div>
                                 </li>
                                 @endforeach
