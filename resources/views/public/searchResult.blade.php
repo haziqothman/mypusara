@@ -2,10 +2,11 @@
 
 @section('content')
 <style>
+    /* Base Map Styles */
     #map-container {
-        min-height: 500px;
+        min-height: 300px;
         border-radius: 8px;
-        height: 500px;
+        height: 100%;
         width: 100%;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         background-color: #e9ecef;
@@ -17,6 +18,108 @@
         width: 100%;
     }
 
+    /* Responsive Adjustments */
+    @media (max-width: 991.98px) {
+        /* iPad and below */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .table {
+            font-size: 0.9rem;
+        }
+        
+        .coordinate-display {
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        /* Phone sizes */
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .row {
+            flex-direction: column;
+        }
+        
+        .col-md-6 {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        #map-container {
+            min-height: 350px;
+        }
+        
+        .map-card {
+            margin-top: 20px;
+        }
+        
+        .view-map {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .coordinate-label {
+            width: 30px;
+        }
+        
+        .visual-guide {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        /* Small phones */
+        .table thead {
+            display: none;
+        }
+        
+        .table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .table tbody td:before {
+            content: attr(data-label);
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        
+        .table tbody td:last-child {
+            border-bottom: none;
+        }
+        
+        .d-flex.gap-2 {
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            margin-bottom: 5px;
+            width: 100%;
+        }
+    }
+
+    /* Common Styles (unchanged from your original) */
     .view-map {
         cursor: pointer;
         transition: all 0.3s ease;
@@ -32,6 +135,7 @@
         border-top: 1px solid #dee2e6;
         border-radius: 0 0 8px 8px;
         display: none;
+        padding: 15px;
     }
 
     .coordinate-display {
@@ -56,6 +160,7 @@
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        height: 100%;
     }
 
     .map-header {
@@ -145,7 +250,7 @@
     }
 </style>
 
-<div class="container py-5">
+<div class="container py-3 py-md-5">
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0"><i class="fas fa-search-location me-2"></i>Hasil Carian Pusara untuk "{{ $searchQuery }}"</h4>
@@ -166,47 +271,49 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>No. Pusara</th>
-                                    <th>Kawasan</th>
-                                    <th>Nama Si Mati</th>
-                                    <th>Tarikh Kematian</th>
-                                    <th>Koordinat</th>
-                                    <th>Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($bookings as $booking)
-                                <tr>
-                                    <td>{{ $booking->package->pusaraNo ?? 'N/A' }}</td>
-                                    <td>{{ $booking->package->getSectionName() ?? 'N/A' }}</td>
-                                    <td>{{ $booking->nama_simati }}</td>
-                                    <td>{{ $booking->eventDate ? \Carbon\Carbon::parse($booking->eventDate)->format('d/m/Y') : 'N/A' }}</td>
-                                    <td>
-                                        @if($booking->package && $booking->package->latitude && $booking->package->longitude)
-                                            <div class="coordinate-display">
-                                                <span class="coordinate-label">Lat:</span> {{ number_format($booking->package->latitude, 6) }}<br>
-                                                <span class="coordinate-label">Lng:</span> {{ number_format($booking->package->longitude, 6) }}
-                                            </div>
-                                        @else
-                                            <span class="text-muted">Tiada koordinat</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info view-map" 
-                                            data-lat="{{ $booking->package->latitude }}"
-                                            data-lng="{{ $booking->package->longitude }}"
-                                            data-pusara="{{ $booking->package->pusaraNo }}"
-                                            data-nama="{{ $booking->nama_simati }}">
-                                            <i class="fas fa-map-marker-alt me-1"></i> Peta
-                                        </button>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>No. Pusara</th>
+                                        <th>Kawasan</th>
+                                        <th>Nama Si Mati</th>
+                                        <th>Tarikh Kematian</th>
+                                        <th>Koordinat</th>
+                                        <th>Tindakan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($bookings as $booking)
+                                    <tr>
+                                        <td data-label="No. Pusara">{{ $booking->package->pusaraNo ?? 'N/A' }}</td>
+                                        <td data-label="Kawasan">{{ $booking->package->getSectionName() ?? 'N/A' }}</td>
+                                        <td data-label="Nama Si Mati">{{ $booking->nama_simati }}</td>
+                                        <td data-label="Tarikh Kematian">{{ $booking->eventDate ? \Carbon\Carbon::parse($booking->eventDate)->format('d/m/Y') : 'N/A' }}</td>
+                                        <td data-label="Koordinat">
+                                            @if($booking->package && $booking->package->latitude && $booking->package->longitude)
+                                                <div class="coordinate-display">
+                                                    <span class="coordinate-label">Lat:</span> {{ number_format($booking->package->latitude, 6) }}<br>
+                                                    <span class="coordinate-label">Lng:</span> {{ number_format($booking->package->longitude, 6) }}
+                                                </div>
+                                            @else
+                                                <span class="text-muted">Tiada koordinat</span>
+                                            @endif
+                                        </td>
+                                        <td data-label="Tindakan">
+                                            <button class="btn btn-sm btn-info view-map" 
+                                                data-lat="{{ $booking->package->latitude }}"
+                                                data-lng="{{ $booking->package->longitude }}"
+                                                data-pusara="{{ $booking->package->pusaraNo }}"
+                                                data-nama="{{ $booking->nama_simati }}">
+                                                <i class="fas fa-map-marker-alt me-1"></i> Peta
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div class="d-flex justify-content-center mt-4">
                             {{ $bookings->links() }}
@@ -218,7 +325,7 @@
                             <div class="card-header map-header text-white">
                                 <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Lokasi Pusara</h5>
                             </div>
-                            <div class="card-body p-0" style="height: 500px;">
+                            <div class="card-body p-0" style="height: 400px;">
                                 <div class="map-placeholder">
                                     <div>
                                         <i class="fas fa-map-marked-alt fa-3x mb-3"></i>
@@ -241,21 +348,21 @@
                                 <div id="coordinate-info" class="p-3 bg-light border-top">
                                     <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Maklumat Pusara</h6>
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-6">
                                             <p class="mb-1"><strong>No. Pusara:</strong></p>
                                             <p id="info-pusara" class="text-monospace">-</p>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-6">
                                             <p class="mb-1"><strong>Nama Si Mati:</strong></p>
                                             <p id="info-nama" class="text-monospace">-</p>
                                         </div>
                                     </div>
                                     <div class="row mt-2">
-                                        <div class="col-md-6">
+                                        <div class="col-6">
                                             <p class="mb-1"><strong>Latitude:</strong></p>
                                             <p id="info-lat" class="text-monospace">-</p>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-6">
                                             <p class="mb-1"><strong>Longitude:</strong></p>
                                             <p id="info-lng" class="text-monospace">-</p>
                                         </div>
@@ -283,6 +390,7 @@
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQxsM5lTtMzAEgzBz3X3SL1Gp7BDmubTc&callback=initMap" async defer></script>
 <script>
+    // (Keep your existing JavaScript code unchanged)
     let map, activeInfoWindow, markers = [];
     let mapInitialized = false;
     let plotBoundary = null;
