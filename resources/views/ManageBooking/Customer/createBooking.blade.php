@@ -222,7 +222,7 @@
                             </div>
                             
                             <div class="mt-3">
-                                <label for="notes" class="form-label">Nota Tambahan</label>
+                                <label for="notes" class="form-label">Nota Tambahan - sebab kematian(pilihan)</label>
                                 <textarea id="notes" name="notes" rows="2" class="form-control" 
                                           placeholder="Sila nyatakan sebarang keperluan khas atau nota tambahan"></textarea>
                             </div>

@@ -223,7 +223,7 @@
                                         </div>
                                         
                                         <div class="col-12">
-                                            <label for="notes" class="form-label">Catatan Tambahan</label>
+                                            <label for="notes" class="form-label">Nota Tambahan - sebab kematian(pilihan)</label>
                                             <textarea id="notes" name="notes" rows="3" class="form-control" 
                                                       placeholder="Arahan khas atau maklumat tambahan">{{ old('notes', $booking->notes) }}</textarea>
                                         </div>

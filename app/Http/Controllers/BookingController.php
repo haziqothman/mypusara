@@ -167,7 +167,7 @@ class BookingController extends Controller
             return redirect()
                 ->route('ManageBooking.Customer.dashboardBooking')
                 ->with([
-                    'success' => 'Booking created successfully!',
+                    'success' => 'Tempahan berjaya dibuat!',
                     'booking_id' => $booking->id
                 ]);
 
