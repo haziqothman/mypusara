@@ -221,25 +221,7 @@ class BookingController extends Controller
 
    public function update(Request $request, Booking $booking)
 {
-        function makeDevFormValidator(array $data, array $rules): array
-    {
-        $validator = Validator::make($data, $rules);
-
-        $response = function () use ($validator) {
-            return response()->json([
-                'at' => 'form',
-                'errors' => $validator->errors(),
-                'data' => $validator->getData(),
-            ], 422);
-        };
-
-        return [
-            'validator' => $validator,
-            'response' => $response,
-        ];
-    }
-
-    $validation = makeDevFormValidator ($request->all(), [
+    $validator = Validator::make($request->all(), [
         'customerName' => 'required|string|max:255',
         'no_mykad' => 'required|string|max:20',
         'customerEmail' => 'required|email|max:255',
@@ -254,23 +236,25 @@ class BookingController extends Controller
             'required',
             'date',
             function ($attribute, $value, $fail) {
-                if (strtotime($value) < strtotime('today midnight')) {
-                    $fail('The event date field must be a date after or equal to today.');
+                if (strtotime($value) < strtotime('today')) {
+                    $fail('The event date must be today or in the future.');
                 }
             }
         ],
-        'eventTime' => 'required|date_format:H:i:s',
+        'eventTime' => 'required|date_format:H:i',
         'eventLocation' => 'required|string|max:255',
         'death_certificate_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
     ]);
 
-     if ($validation['validator']->fails()) {
-            return $validation['response']();
-        }
-
-        $validated = $validation['validator']->validated();
+    if ($validator->fails()) {
+        return back()
+            ->withErrors($validator)
+            ->withInput();
+    }
 
     try {
+        $validated = $validator->validated();
+
         // Handle new image upload if provided
         if ($request->hasFile('death_certificate_image')) {
             // Delete old image if exists
@@ -291,38 +275,18 @@ class BookingController extends Controller
         }
 
         // Update all fields
-        $booking->customerName = $validated['customerName'];
-        $booking->no_mykad = $validated['no_mykad'];
-        $booking->customerEmail = $validated['customerEmail'];
-        $booking->contactNumber = $validated['contactNumber'];
-        $booking->jantina_simati = $validated['jantina_simati'];
-        $booking->area = $validated['area'];
-        $booking->nama_simati = $validated['nama_simati'];
-        $booking->no_mykad_simati = $validated['no_mykad_simati'];
-        $booking->no_sijil_kematian = $validated['no_sijil_kematian'];
-        $booking->waris_address = $validated['waris_address'];
-        $booking->notes = $validated['notes'] ?? null;
-        $booking->eventDate = $validated['eventDate'];
-        $booking->eventTime = $validated['eventTime'];
-        $booking->eventLocation = $validated['eventLocation'];
-        // $booking->death_certificate_image = $validated['death_certificate_image'];
-
+        $booking->fill($validated);
         $booking->save();
 
         return redirect()->route('ManageBooking.Customer.dashboardBooking')
             ->with('success', 'Tempahan berjaya dikemaskini!');
 
     } catch (\Exception $e) {
-        // return back()
-        //     ->with('error', 'Ralat: '.$e->getMessage())
-        //     ->withInput();
-
-        return response()->json([
-            'error' => 'Ralat: '.$e->getMessage(),
-            'data' => $request->all()
-        ], 500);
-       }
+        return back()
+            ->with('error', 'Ralat: '.$e->getMessage())
+            ->withInput();
     }
+}
     
     public function editAdmin($id)
     {

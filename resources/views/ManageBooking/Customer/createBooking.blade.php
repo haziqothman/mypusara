@@ -34,7 +34,7 @@
 
         {{-- Form --}}
         <div class="card-body p-5">
-           <form method="POST" action="{{ route('customer.store.booking', $package->id) }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <form method="POST" action="{{ url('customer/customer/' .$package->id. '/store-booking') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
                 @csrf
                 <input type="hidden" name="packageId" value="{{ $package->id }}">
 
@@ -192,7 +192,8 @@
                                     <label for="eventDate" class="form-label">Tarikh</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-calendar-day"></i></span>
-                                        <input type="date" id="eventDate" name="eventDate" class="form-control" required>
+                                       <input type="date" id="eventDate" name="eventDate" class="form-control" 
+                                         value="{{ old('eventDate', $booking->eventDate ? $booking->eventDate->format('Y-m-d') : '') }}" required>
                                     </div>
                                 </div>
                                 
@@ -200,7 +201,8 @@
                                     <label for="eventTime" class="form-label">Masa</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-clock"></i></span>
-                                        <input type="time" id="eventTime" name="eventTime" class="form-control" required>
+                                        <input type="time" id="eventTime" name="eventTime" class="form-control" 
+                                         value="{{ old('eventTime', $booking->eventTime ? $booking->eventTime->format('H:i') : '') }}" required>
                                     </div>
                                 </div>
                             </div>
@@ -250,88 +252,51 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ms.js"></script>
 
     <script>
- document.addEventListener('DOMContentLoaded', function() {
-    // 1. Get the form element
-    const bookingForm = document.querySelector('form.needs-validation');
-    if (!bookingForm) {
-        console.error('Form not found');
-        return;
-    }
-
-    // 2. Initialize date pickers (without problematic locale)
-    try {
-        flatpickr("#eventDate", {
-            dateFormat: "Y-m-d",
-            minDate: "today",
-            onChange: function(selectedDates) {
-                validateField(this.input);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if the package is available when page loads
+            const packageStatus = "{{ $package->isAvailable() ? 'available' : 'unavailable' }}";
+            
+            if(packageStatus === 'unavailable') {
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('This grave is no longer available for booking');
+                    return false;
+                });
             }
+            
+            // Initialize Flatpickr for the date
+            flatpickr("#eventDate", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                locale: "ms", // Malay localization
+            });
+
+            // Initialize Flatpickr for the time
+            flatpickr("#eventTime", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                minuteIncrement: 15,
+                locale: "ms"
+            });
+
+            // Form validation
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })();
         });
-    } catch (error) {
-        console.error('Date picker error:', error);
-    }
-
-    try {
-        flatpickr("#eventTime", {
-            enableTime: true,
-            noCalendar: true,
-            dateFormat: "H:i",
-            time_24hr: true,
-            onChange: function(selectedDates) {
-                validateField(this.input);
-            }
-        });
-    } catch (error) {
-        console.error('Time picker error:', error);
-    }
-
-    // 3. Field validation function
-    const validateField = (field) => {
-        const isValid = field.checkValidity();
-        field.classList.toggle('is-valid', isValid);
-        field.classList.toggle('is-invalid', !isValid);
-        return isValid;
-    };
-
-    // 4. Form submission handler
-    bookingForm.addEventListener('submit', function(e) {
-        // Validate all fields
-        let allValid = true;
-        this.querySelectorAll('input, select, textarea').forEach(field => {
-            if (!validateField(field)) allValid = false;
-        });
-
-        if (!allValid) {
-            e.preventDefault();
-            e.stopPropagation();
-            alert('Please complete all required fields correctly');
-        }
-        // If valid, allow normal form submission
-    });
-
-    // 5. Real-time validation
-    bookingForm.querySelectorAll('input, select, textarea').forEach(field => {
-        field.addEventListener('input', function() {
-            validateField(this);
-        });
-    });
-
-    // 6. File upload validation
-    const fileInput = document.getElementById('death_certificate_image');
-    if (fileInput) {
-        fileInput.addEventListener('change', function() {
-            if (this.files[0]?.size > 2 * 1024 * 1024) {
-                this.setCustomValidity('File must be smaller than 2MB');
-            } else {
-                this.setCustomValidity('');
-            }
-            validateField(this);
-        });
-    }
-
-    // Initial validation state
-    bookingForm.classList.add('was-validated');
-});
     </script>
 
     <style>
