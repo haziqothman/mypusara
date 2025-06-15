@@ -196,7 +196,7 @@
                     {{-- Notes --}}
                     <div class="col-md-6">
                         <div class="detail-section h-100">
-                            <h6 class="section-title"><i class="fas fa-sticky-note me-2"></i> Catatan Tambahan</h6>
+                            <h6 class="section-title"><i class="fas fa-sticky-note me-2"></i> Nota Tambahan - sebab kematian</h6>
                             <div class="notes-box">
                                 {{ $booking->notes ?: 'Tiada catatan tambahan.' }}
                             </div>
