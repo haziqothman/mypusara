@@ -79,7 +79,7 @@
                                     <input type="text" class="form-control @error('address') is-invalid @enderror" 
                                            id="address" name="address" value="{{ old('address', $user->address) }}" 
                                            placeholder="Street Address" required>
-                                    <label for="address">MAlamat Jalan</label>
+                                    <label for="address">Alamat Jalan</label>
                                     @error('address')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

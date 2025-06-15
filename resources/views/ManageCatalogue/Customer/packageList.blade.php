@@ -78,6 +78,7 @@
     {{-- Compact Map Legend --}}
     <div class="card shadow-sm mb-5 mx-auto" style="max-width: 800px; border: none; border-radius: 12px;">
         <div class="card-body p-3">
+            <h6 class="text-center mb-3 fw-bold text-muted" style="font-size: 0.9rem;">LEGENDA PETA PUSARA</h6>
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 <div class="legend-item compact">
                     <div class="legend-icon road d-flex align-items-center justify-content-center">
