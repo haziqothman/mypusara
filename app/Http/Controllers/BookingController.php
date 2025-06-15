@@ -256,7 +256,6 @@ class BookingController extends Controller
         'area' => 'required|string|max:100',
         'nama_simati' => 'required|string|max:255',
         'no_mykad_simati' => 'required|string|max:20',
-        'no_sijil_kematian' => 'required|string|max:20',
         'waris_address' => 'required|string|max:255',
         'eventDate' => 'required|date|after_or_equal:today',
         'eventTime' => 'required',

@@ -152,8 +152,10 @@
                             <a href="https://wa.me/601137490379" target="_blank" class="btn btn-success rounded-pill">
                                 <i class="fab fa-whatsapp me-2"></i> WhatsApp Kami
                             </a>
-                            <a href="mailto:haziq.othman99@gmail.com" class="btn btn-outline-primary rounded-pill">
-                                <i class="fas fa-envelope me-2"></i> Hantar Emel
+                          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=haziq.othman99@gmail.com&su=Pertanyaan Tempahan Pusara&body=Sila nyatakan pertanyaan anda..." 
+                            target="_blank"
+                            class="btn btn-outline-primary rounded-pill">
+                            <i class="fas fa-envelope me-2"></i> Hantar Emel melalui Gmail
                             </a>
                         </div>
                     </div>

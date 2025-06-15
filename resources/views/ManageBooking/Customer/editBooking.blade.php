@@ -120,12 +120,12 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="no_sijil_kematian" class="form-label">>No Khairat Kematian</label>
+                                        <label for="no_sijil_kematian" class="form-label">No Khairat Kematian</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white"><i class="fas fa-award"></i></span>
                                             <input type="text" id="no_sijil_kematian" name="no_sijil_kematian" 
                                                    value="{{ old('no_sijil_kematian', $booking->no_sijil_kematian) }}" 
-                                                   class="form-control" placeholder="A1234567" required>
+                                                   class="form-control" placeholder="A1234567">
                                         </div>
                                     </div>
 
