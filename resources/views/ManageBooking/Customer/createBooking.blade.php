@@ -22,6 +22,17 @@
         </a>
     @endif
 
+    @if($errors->any())
+<div class="alert alert-danger">
+    <h5><i class="icon fas fa-ban"></i> Form Errors!</h5>
+    <ul class="mb-0">
+        @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
     {{-- Main content --}}
     <div class="card border-0 shadow-lg overflow-hidden">
         {{-- Header with gradient background --}}
@@ -34,7 +45,7 @@
 
         {{-- Form --}}
         <div class="card-body p-5">
-            <form method="POST" action="{{ url('customer/customer/' .$package->id. '/store-booking') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <form method="POST" action="{{ route('customer.store.booking', $package->id) }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="packageId" value="{{ $package->id }}">
 
@@ -192,8 +203,7 @@
                                     <label for="eventDate" class="form-label">Tarikh</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-calendar-day"></i></span>
-                                       <input type="date" id="eventDate" name="eventDate" class="form-control" 
-                                         value="{{ old('eventDate', $booking->eventDate ? $booking->eventDate->format('Y-m-d') : '') }}" required>
+                                        <input type="date" id="eventDate" name="eventDate" class="form-control" required>
                                     </div>
                                 </div>
                                 
@@ -201,8 +211,7 @@
                                     <label for="eventTime" class="form-label">Masa</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i class="fas fa-clock"></i></span>
-                                        <input type="time" id="eventTime" name="eventTime" class="form-control" 
-                                         value="{{ old('eventTime', $booking->eventTime ? $booking->eventTime->format('H:i') : '') }}" required>
+                                        <input type="time" id="eventTime" name="eventTime" class="form-control" required>
                                     </div>
                                 </div>
                             </div>

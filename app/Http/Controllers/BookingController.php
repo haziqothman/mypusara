@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -98,9 +99,9 @@ class BookingController extends Controller
         ]);
     }
 
-    public function store(Request $request, string $id)
+  public function store(Request $request, $id)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'customerName' => 'required|string|max:255',
             'no_mykad' => 'required|string|max:20',
             'customerEmail' => 'required|email|max:255',
@@ -108,55 +109,80 @@ class BookingController extends Controller
             'jantina_simati' => 'required|in:Lelaki,Perempuan',
             'area' => 'required|string|max:100',
             'nama_simati' => 'required|string|max:255',
-            'no_mykad_simati' => 'required|string|max:20', // Required field
+            'no_mykad_simati' => 'required|string|max:20',
             'no_sijil_kematian' => 'required|string|max:20',
             'waris_address' => 'required|string|max:255',
             'notes' => 'nullable|string|max:500',
-            'eventDate' => 'required|date|after_or_equal:today',
+            'eventDate' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    if (Carbon::parse($value)->isPast()) {
+                        $fail('The event date must be in the future.');
+                    }
+                }
+            ],
             'eventTime' => 'required|date_format:H:i',
             'eventLocation' => 'required|string|max:255',
-            'death_certificate_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'death_certificate_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            Log::error('Validation failed', ['errors' => $validator->errors()]);
+            return redirect()
+                ->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         try {
-        // Handle image upload - same approach as your package images
-        $filePath = public_path('death_certificates');
-        $file = $request->file('death_certificate_image');
-        $file_name = time() . '_' . $file->getClientOriginalName();
-        $file->move($filePath, $file_name);
+            // Handle file upload
+            $file = $request->file('death_certificate_image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('death_certificates'), $fileName);
 
-       
+            $booking = Booking::create([
+                'customerName' => $request->customerName,
+                'no_mykad' => $request->no_mykad,
+                'customerEmail' => $request->customerEmail,
+                'contactNumber' => $request->contactNumber,
+                'jantina_simati' => $request->jantina_simati,
+                'area' => $request->area,
+                'nama_simati' => $request->nama_simati,
+                'no_mykad_simati' => $request->no_mykad_simati,
+                'no_sijil_kematian' => $request->no_sijil_kematian,
+                'waris_address' => $request->waris_address,
+                'notes' => $request->notes,
+                'eventDate' => $request->eventDate,
+                'eventTime' => $request->eventTime,
+                'eventLocation' => $request->eventLocation,
+                'death_certificate_image' => $fileName,
+                'user_id' => Auth::id(),
+                'packageId' => $id,
+                'status' => 'pending'
+            ]);
+
+            Log::info('Booking created successfully', ['booking_id' => $booking->id]);
+
+            return redirect()
+                ->route('ManageBooking.Customer.dashboardBooking')
+                ->with([
+                    'success' => 'Booking created successfully!',
+                    'booking_id' => $booking->id
+                ]);
+
+        } catch (\Exception $e) {
+            Log::error('Booking creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
-        Booking::create([
-           'customerName' => $validated['customerName'],
-            'no_mykad' => $validated['no_mykad'],
-            'customerEmail' => $validated['customerEmail'],
-            'contactNumber' => $validated['contactNumber'],
-            'jantina_simati' => $validated['jantina_simati'],
-            'area' => $validated['area'],
-            'nama_simati' => $validated['nama_simati'],
-            'no_mykad_simati' => $validated['no_mykad_simati'],  // Ensure the field is included
-            'no_sijil_kematian' => $validated['no_sijil_kematian'],
-            'waris_address' => $validated['waris_address'],
-            'notes' => $validated['notes'] ?? null,
-            'eventDate' => $validated['eventDate'],
-            'eventTime' => $validated['eventTime'],
-            'eventLocation' => $validated['eventLocation'],
-            'user_id' => Auth::id(),
-            'packageId' => $id,
-            'status' => 'pending',
-            'death_certificate_image' => $validated['death_certificate_image'] ? $file_name : null,
-        ]);
-    
-        return redirect()->route('ManageBooking.Customer.dashboardBooking')
-        ->with('success', 'Tempahan berjaya dibuat! Notifikasi telah dihantar kepada penggali pusara.');
-    
-     } catch (\Exception $e) {
-        return back()
-            ->with('error', 'Ralat: '.$e->getMessage())
-            ->withInput();
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to create booking: ' . $e->getMessage())
+                ->withInput();
+        }
     }
-}
 
     private function sendGraveDiggerNotification($booking, $package)
     {
@@ -219,9 +245,10 @@ class BookingController extends Controller
         return view('ManageBooking.Customer.editBooking', compact('booking', 'packages'));
     }
 
-   public function update(Request $request, Booking $booking)
+  public function update(Request $request, Booking $booking)
 {
-    $validator = Validator::make($request->all(), [
+    // Validate all fields
+    $validated = $request->validate([
         'customerName' => 'required|string|max:255',
         'no_mykad' => 'required|string|max:20',
         'customerEmail' => 'required|email|max:255',
@@ -232,58 +259,46 @@ class BookingController extends Controller
         'no_mykad_simati' => 'required|string|max:20',
         'no_sijil_kematian' => 'required|string|max:20',
         'waris_address' => 'required|string|max:255',
-        'eventDate' => [
-            'required',
-            'date',
-            function ($attribute, $value, $fail) {
-                if (strtotime($value) < strtotime('today')) {
-                    $fail('The event date must be today or in the future.');
-                }
-            }
-        ],
-        'eventTime' => 'required|date_format:H:i',
+        'eventDate' => 'required|date|after_or_equal:today',
+        'eventTime' => 'required',
         'eventLocation' => 'required|string|max:255',
-        'death_certificate_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        'death_certificate_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'notes' => 'nullable|string|max:500'
     ]);
 
-    if ($validator->fails()) {
-        return back()
-            ->withErrors($validator)
-            ->withInput();
-    }
-
     try {
-        $validated = $validator->validated();
+        // Verify the booking belongs to the current customer
+        if ($booking->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
-        // Handle new image upload if provided
+        // Handle file upload if provided
         if ($request->hasFile('death_certificate_image')) {
             // Delete old image if exists
             if ($booking->death_certificate_image) {
-                $oldFilePath = public_path('death_certificates/' . $booking->death_certificate_image);
-                if (file_exists($oldFilePath)) {
-                    unlink($oldFilePath);
+                $oldImagePath = public_path('death_certificates/' . $booking->death_certificate_image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
                 }
             }
-            
+
             // Upload new image
-            $filePath = public_path('death_certificates');
             $file = $request->file('death_certificate_image');
-            $file_name = time() . '_' . $file->getClientOriginalName();
-            $file->move($filePath, $file_name);
-            
-            $booking->death_certificate_image = $file_name;
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('death_certificates'), $fileName);
+            $validated['death_certificate_image'] = $fileName;
         }
 
         // Update all fields
-        $booking->fill($validated);
-        $booking->save();
+        $booking->update($validated);
 
-        return redirect()->route('ManageBooking.Customer.dashboardBooking')
+        return redirect()
+            ->route('ManageBooking.Customer.dashboardBooking')
             ->with('success', 'Tempahan berjaya dikemaskini!');
 
     } catch (\Exception $e) {
         return back()
-            ->with('error', 'Ralat: '.$e->getMessage())
+            ->with('error', 'Ralat semasa mengemaskini: ' . $e->getMessage())
             ->withInput();
     }
 }
