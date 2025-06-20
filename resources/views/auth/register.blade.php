@@ -21,11 +21,28 @@
     }
 
     .auth-container {
-      max-width: 450px;
+      max-width: 900px;
+      width: 100%;
       border-radius: 15px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       border: none;
+      display: flex;
+    }
+
+    .auth-form-section {
+      flex: 1;
+      padding: 0;
+      background: white;
+    }
+
+    .auth-requirements-section {
+      flex: 1;
+      background: #f8fafc;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .auth-header {
@@ -43,13 +60,21 @@
 
     .auth-body {
       padding: 2rem;
-      background: white;
     }
 
     .auth-title {
       font-weight: 600;
       color: var(--text-color);
       margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-size: 1.5rem;
     }
 
     .form-floating>label {
@@ -75,11 +100,13 @@
       font-weight: 600;
       border-radius: 8px;
       transition: all 0.3s ease;
+      width: 100%;
     }
 
     .btn-auth:hover {
       background: var(--primary-hover);
       transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .auth-footer {
@@ -153,23 +180,25 @@
 
     /* Password Requirements */
     .requirements-box {
-      background-color: #f0f9ff;
-      border-radius: 0.5rem;
-      padding: 1rem;
-      margin-top: 1rem;
+      background-color: white;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .requirements-title {
       display: flex;
       align-items: center;
-      font-size: 0.875rem;
+      justify-content: center;
+      font-size: 1rem;
       font-weight: 600;
-      color: #1e40af;
-      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
     }
 
     .requirements-title i {
       margin-right: 0.5rem;
+      font-size: 1.2rem;
     }
 
     .requirements-list {
@@ -181,13 +210,22 @@
     .requirement-item {
       display: flex;
       align-items: center;
-      font-size: 0.8125rem;
-      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .requirement-item:hover {
+      background-color: #f8f9fa;
     }
 
     .requirement-item i {
-      margin-right: 0.5rem;
-      font-size: 0.7rem;
+      margin-right: 0.75rem;
+      font-size: 0.9rem;
+      width: 20px;
+      text-align: center;
     }
 
     .requirement-met {
@@ -227,152 +265,180 @@
     .alert {
       border-radius: 0.5rem;
     }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .auth-container {
+        flex-direction: column;
+        max-width: 450px;
+      }
+      
+      .auth-requirements-section {
+        order: -1;
+        padding: 1.5rem;
+      }
+      
+      .requirements-box {
+        padding: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="container d-flex justify-content-center align-items-center min-vh-100 py-4">
     <div class="auth-container">
-      <div class="auth-header">
-        <button class="close-btn" onclick="window.location.href='{{ route('landing') }}'">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <img src="{{ asset('avatars/1734019274.png') }}" alt="myPusara Logo" class="auth-logo">
-        <h3 class="mb-0">Buat Akaun Baharu</h3>
-      </div>
-      <div class="auth-body">
-        <h4 class="auth-title">Daftar untuk Mula Menggunakan myPusara</h4>
-
-        @if(session('error'))
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        @endif
-
-        <form method="POST" action="{{ route('register') }}" id="registrationForm">
-          @csrf
-
-          <!-- Honeypot field for spam protection -->
-          <input type="text" name="honeypot" style="display:none;" value="">
-
-          <div class="mb-3">
-            <div class="form-floating">
-              <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                     id="name" name="name" placeholder="Full Name" 
-                     value="{{ old('name') }}" required autofocus
-                     pattern="^[a-zA-Z\s]{2,50}$"
-                     title="Name should be 2-50 alphabetic characters">
-              <label for="name">Nama Penuh</label>
-              @error('name')
-                <div class="invalid-feedback">
-                  <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
-                </div>
-              @enderror
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <div class="form-floating">
-              <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                     id="email" name="email" placeholder="name@example.com" 
-                     value="{{ old('email') }}" required
-                     pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
-              <label for="email">Alamat Email</label>
-              @error('email')
-                <div class="invalid-feedback">
-                  <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
-                </div>
-              @enderror
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <div class="form-floating">
-              <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                     id="password" name="password" placeholder="Password" required
-                     oninput="checkPasswordStrength(this.value)"
-                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!#%*?&])[A-Za-z\d@$!#%*?&]{8,}$">
-              <label for="password">Kata Laluan</label>
-              <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password')">
-                <i class="fas fa-eye" id="togglePasswordIcon"></i>
-              </button>
-              @error('password')
-                <div class="invalid-feedback">
-                  <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
-                </div>
-              @enderror
-            </div>
-            
-            <!-- Password Strength Meter -->
-            <div class="password-strength-container">
-              <div class="strength-meter">
-                <span class="strength-label">Kekuatan Kata Laluan:</span>
-                <span class="strength-value" id="passwordStrengthText">Lemah</span>
-              </div>
-              <div class="strength-bar">
-                <div class="strength-progress" id="passwordStrengthBar"></div>
-              </div>
-            </div>
-            
-            <!-- Password Requirements -->
-            <div class="requirements-box">
-              <div class="requirements-title">
-                <i class="fas fa-info-circle"></i>
-                <span>Keperluan Kata Laluan</span>
-              </div>
-              <ul class="requirements-list">
-                <li class="requirement-item" id="reqLength">
-                  <i class="fas fa-circle requirement-unmet"></i>
-                  <span>Minimum 8 aksara</span>
-                </li>
-                <li class="requirement-item" id="reqUpper">
-                  <i class="fas fa-circle requirement-unmet"></i>
-                  <span>Sekurang-kurangnya satu huruf besar</span>
-                </li>
-                <li class="requirement-item" id="reqLower">
-                  <i class="fas fa-circle requirement-unmet"></i>
-                  <span>Sekurang-kurangnya satu huruf kecil</span>
-                </li>
-                <li class="requirement-item" id="reqNumber">
-                  <i class="fas fa-circle requirement-unmet"></i>
-                  <span>Sekurang-kurangnya satu nombor</span>
-                </li>
-                <li class="requirement-item" id="reqSpecial">
-                  <i class="fas fa-circle requirement-unmet"></i>
-                  <span>Sekurang-kurangnya satu aksara khas (@$!#%*?&)</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <div class="form-floating">
-              <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" 
-                     id="password_confirmation" name="password_confirmation" 
-                     placeholder="Confirm Password" required
-                     oninput="checkPasswordMatch()">
-              <label for="password_confirmation">Sahkan Kata Laluan</label>
-              <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password_confirmation')">
-                <i class="fas fa-eye" id="toggleConfirmPasswordIcon"></i>
-              </button>
-              <div class="password-match-error" id="passwordMatchError">
-                <i class="fas fa-exclamation-circle me-1"></i> Kata laluan tidak sepadan
-              </div>
-              @error('password_confirmation')
-                <div class="invalid-feedback">
-                  <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
-                </div>
-              @enderror
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-auth w-100 mb-3">
-            <i class="fas fa-user-plus me-2"></i> Daftar Akaun
+      <!-- Left side with form -->
+      <div class="auth-form-section">
+        <div class="auth-header">
+          <button class="close-btn" onclick="window.location.href='{{ route('landing') }}'">
+            <i class="fas fa-arrow-left"></i>
           </button>
-        </form>
+          <img src="{{ asset('avatars/1734019274.png') }}" alt="myPusara Logo" class="auth-logo">
+          <h3 class="mb-0">Buat Akaun Baharu</h3>
+        </div>
+        <div class="auth-body">
+          <h4 class="auth-title">Daftar untuk Mula Menggunakan myPusara</h4>
 
-        <div class="auth-footer">
-          Sudah mempunyai akaun? <a href="{{ route('login') }}" class="auth-link">Log Masuk</a>
+          @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              {{ session('error') }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          @endif
+
+          <form method="POST" action="{{ route('register') }}" id="registrationForm">
+            @csrf
+
+            <!-- Honeypot field for spam protection -->
+            <input type="text" name="honeypot" style="display:none;" value="">
+
+            <div class="mb-3">
+              <div class="form-floating">
+                <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                       id="name" name="name" placeholder="Full Name" 
+                       value="{{ old('name') }}" required autofocus
+                       pattern="^[a-zA-Z\s]{2,50}$"
+                       title="Name should be 2-50 alphabetic characters">
+                <label for="name"><i class="fas fa-user me-2"></i> Nama Penuh</label>
+                @error('name')
+                  <div class="invalid-feedback">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
+                  </div>
+                @enderror
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="form-floating">
+                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                       id="email" name="email" placeholder="name@example.com" 
+                       value="{{ old('email') }}" required
+                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                <label for="email"><i class="fas fa-envelope me-2"></i> Alamat Email</label>
+                @error('email')
+                  <div class="invalid-feedback">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
+                  </div>
+                @enderror
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="form-floating">
+                <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                       id="password" name="password" placeholder="Password" required
+                       oninput="checkPasswordStrength(this.value)"
+                       pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!#%*?&])[A-Za-z\d@$!#%*?&]{8,}$">
+                <label for="password"><i class="fas fa-lock me-2"></i> Kata Laluan</label>
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password')">
+                  <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                </button>
+                @error('password')
+                  <div class="invalid-feedback">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
+                  </div>
+                @enderror
+              </div>
+              
+              <!-- Password Strength Meter -->
+              <div class="password-strength-container">
+                <div class="strength-meter">
+                  <span class="strength-label">Kekuatan Kata Laluan:</span>
+                  <span class="strength-value" id="passwordStrengthText">Lemah</span>
+                </div>
+                <div class="strength-bar">
+                  <div class="strength-progress" id="passwordStrengthBar"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="form-floating">
+                <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" 
+                       id="password_confirmation" name="password_confirmation" 
+                       placeholder="Confirm Password" required
+                       oninput="checkPasswordMatch()">
+                <label for="password_confirmation"><i class="fas fa-lock me-2"></i> Sahkan Kata Laluan</label>
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password_confirmation')">
+                  <i class="fas fa-eye" id="toggleConfirmPasswordIcon"></i>
+                </button>
+                <div class="password-match-error" id="passwordMatchError">
+                  <i class="fas fa-exclamation-circle me-1"></i> Kata laluan tidak sepadan
+                </div>
+                @error('password_confirmation')
+                  <div class="invalid-feedback">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
+                  </div>
+                @enderror
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-auth mb-3">
+              <i class="fas fa-user-plus me-2"></i> Daftar Akaun
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            Sudah mempunyai akaun? <a href="{{ route('login') }}" class="auth-link">Log Masuk</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right side with password requirements -->
+      <div class="auth-requirements-section">
+        <h3 class="section-title">Keperluan Kata Laluan</h3>
+        <div class="requirements-box">
+          <div class="requirements-title">
+            <i class="fas fa-shield-alt"></i>
+            <span>Kata Laluan Anda Perlu:</span>
+          </div>
+          <ul class="requirements-list">
+            <li class="requirement-item" id="reqLength">
+              <i class="fas fa-circle requirement-unmet"></i>
+              <span>Minimum 8 aksara</span>
+            </li>
+            <li class="requirement-item" id="reqUpper">
+              <i class="fas fa-circle requirement-unmet"></i>
+              <span>Sekurang-kurangnya satu huruf besar</span>
+            </li>
+            <li class="requirement-item" id="reqLower">
+              <i class="fas fa-circle requirement-unmet"></i>
+              <span>Sekurang-kurangnya satu huruf kecil</span>
+            </li>
+            <li class="requirement-item" id="reqNumber">
+              <i class="fas fa-circle requirement-unmet"></i>
+              <span>Sekurang-kurangnya satu nombor</span>
+            </li>
+            <li class="requirement-item" id="reqSpecial">
+              <i class="fas fa-circle requirement-unmet"></i>
+              <span>Sekurang-kurangnya satu aksara khas (@$!#%*?&)</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="mt-4 text-center">
+          <i class="fas fa-info-circle text-primary me-2"></i>
+          <small class="text-muted">Kata laluan anda akan disimpan dengan selamat</small>
         </div>
       </div>
     </div>

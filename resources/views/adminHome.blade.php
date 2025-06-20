@@ -8,30 +8,33 @@
             <h2 class="fw-bold text-gradient mb-1">Selamat Datang, {{ Auth::user()->name }}!</h2>
             <p class="text-muted mb-0">Dashboard Pentadbir - Sistem Pengurusan Pusara</p>
         </div>
-        <div class="avatar avatar-lg bg-primary text-white rounded-circle">
-            <i class="fas fa-user-shield"></i>
+        <div class="position-relative">
+            <div class="avatar avatar-lg bg-primary text-white rounded-circle border border-3 border-primary shadow">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <span class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-2 border-white" style="width: 15px; height: 15px;"></span>
         </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Stats Cards with Images -->
     <div class="row mb-4 g-4">
         <!-- Total Bookings -->
         <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body">
+            <div class="card border-0 shadow-sm rounded-3 h-100 hover-lift" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
+                <div class="card-body text-white position-relative" style="z-index: 1;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-uppercase text-muted mb-2">
+                            <h6 class="text-uppercase text-white-50 mb-2">
                                 <i class="fas fa-calendar-check me-2"></i> Jumlah Tempahan
                             </h6>
                             <h2 class="mb-0">{{ $stats['total_bookings'] }}</h2>
                         </div>
-                        <div class="bg-primary bg-opacity-10 p-3 rounded">
-                            <i class="fas fa-calendar text-primary"></i>
+                        <div class="bg-white-10 p-3 rounded-circle">
+                            <i class="fas fa-calendar-alt fs-4"></i>
                         </div>
                     </div>
                     <div class="mt-3">
-                        <span class="badge bg-primary bg-opacity-10 text-primary">
+                        <span class="badge bg-white-10 text-white">
                             <i class="fas fa-clock me-1"></i> {{ $stats['new_bookings_today'] }} hari ini
                         </span>
                     </div>
@@ -41,21 +44,21 @@
 
         <!-- Pending Approvals -->
         <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body">
+            <div class="card border-0 shadow-sm rounded-3 h-100 hover-lift" style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);">
+                <div class="card-body text-white position-relative" style="z-index: 1;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-uppercase text-muted mb-2">
+                            <h6 class="text-uppercase text-white-50 mb-2">
                                 <i class="fas fa-clock me-2"></i> Menunggu Kelulusan
                             </h6>
                             <h2 class="mb-0">{{ $stats['pending_approvals'] }}</h2>
                         </div>
-                        <div class="bg-warning bg-opacity-10 p-3 rounded">
-                            <i class="fas fa-exclamation text-warning"></i>
+                        <div class="bg-white-10 p-3 rounded-circle">
+                            <i class="fas fa-hourglass-half fs-4"></i>
                         </div>
                     </div>
                     <div class="mt-3">
-                        <a href="{{ route('admin.bookings.index') }}" class="btn btn-sm btn-warning btn-opacity-10">
+                        <a href="{{ route('admin.bookings.index') }}" class="btn btn-sm btn-light rounded-pill">
                             <i class="fas fa-eye me-1"></i> Lihat
                         </a>
                     </div>
@@ -65,21 +68,21 @@
 
         <!-- Cancelled Bookings -->
         <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body">
+            <div class="card border-0 shadow-sm rounded-3 h-100 hover-lift" style="background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);">
+                <div class="card-body text-white position-relative" style="z-index: 1;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-uppercase text-muted mb-2">
+                            <h6 class="text-uppercase text-white-50 mb-2">
                                 <i class="fas fa-times-circle me-2"></i> Dibatalkan
                             </h6>
                             <h2 class="mb-0">{{ $stats['cancelled'] }}</h2>
                         </div>
-                        <div class="bg-danger bg-opacity-10 p-3 rounded">
-                            <i class="fas fa-ban text-danger"></i>
+                        <div class="bg-white-10 p-3 rounded-circle">
+                            <i class="fas fa-ban fs-4"></i>
                         </div>
                     </div>
                     <div class="mt-3">
-                        <span class="badge bg-danger bg-opacity-10 text-danger">
+                        <span class="badge bg-white-10 text-white">
                             <i class="fas fa-calendar me-1"></i> Sehingga hari ini
                         </span>
                     </div>
@@ -89,21 +92,21 @@
 
         <!-- Completed Burials -->
         <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body">
+            <div class="card border-0 shadow-sm rounded-3 h-100 hover-lift" style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);">
+                <div class="card-body text-white position-relative" style="z-index: 1;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-uppercase text-muted mb-2">
-                                <i class="fas fa-check-circle me-2"></i> Pengebumian Selesai
+                            <h6 class="text-uppercase text-white-50 mb-2">
+                                <i class="fas fa-check-circle me-2"></i> Selesai
                             </h6>
                             <h2 class="mb-0">{{ $stats['completed_burials'] }}</h2>
                         </div>
-                        <div class="bg-info bg-opacity-10 p-3 rounded">
-                            <i class="fas fa-check-double text-info"></i>
+                        <div class="bg-white-10 p-3 rounded-circle">
+                            <i class="fas fa-check-double fs-4"></i>
                         </div>
                     </div>
                     <div class="mt-3">
-                        <span class="badge bg-info bg-opacity-10 text-info">
+                        <span class="badge bg-white-10 text-white">
                             <i class="fas fa-calendar me-1"></i> Sehingga hari ini
                         </span>
                     </div>
@@ -112,32 +115,35 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body">
+    <!-- Grave Availability and Charts -->
+    <div class="row mb-4 g-4">
+        <!-- Grave Availability -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 hover-lift" style="background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);">
+                <div class="card-body text-white position-relative" style="z-index: 1;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-uppercase text-muted mb-2">
+                            <h6 class="text-uppercase text-white-50 mb-2">
                                 <i class="fas fa-tombstone me-2"></i> Bilangan Pusara
                             </h6>
                             <h2 class="mb-0">{{ $stats['available_graves'] }}</h2>
                         </div>
-                        <div class="bg-success bg-opacity-10 p-3 rounded">
-                            <i class="fas fa-warehouse text-success"></i>
+                        <div class="bg-white-10 p-3 rounded-circle">
+                            <i class="fas fa-warehouse fs-4"></i>
                         </div>
                     </div>
-                    <div class="progress mt-3" style="height: 6px;">
-                        <div class="progress-bar bg-success" role="progressbar" 
+                    <div class="progress mt-3 bg-white-20" style="height: 6px;">
+                        <div class="progress-bar bg-white" role="progressbar" 
                             style="width: {{ $stats['grave_utilization'] }}%" 
                             aria-valuenow="{{ $stats['grave_utilization'] }}" 
                             aria-valuemin="0" 
                             aria-valuemax="100"></div>
                     </div>
                     <div class="d-flex gap-2 mt-3">
-                        <a href="{{ route('admin.create.package') }}" class="btn btn-sm btn-success flex-grow-1">
+                        <a href="{{ route('admin.create.package') }}" class="btn btn-sm btn-light flex-grow-1">
                             <i class="fas fa-plus me-1"></i> Tambah
                         </a>
-                    
+                     
                     </div>
                 </div>
             </div>

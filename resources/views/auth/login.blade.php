@@ -21,45 +21,135 @@
     }
     
     .auth-container {
-      max-width: 450px;
+      max-width: 2000px;
+      width: 100%;
       border-radius: 15px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
       border: none;
+      display: flex;
+      height: 700px;
+    }
+    
+    .auth-image {
+      flex: 1.2;
+      background: url('{{ asset("avatars/kubur1.jpeg") }}') center center;
+      background-size: cover;
+      position: relative;
+      transition: all 0.5s ease;
+    }
+    
+    .auth-image:hover {
+      flex: 1.3;
+    }
+    
+    .auth-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(78, 115, 223, 0.85) 0%, rgba(46, 89, 217, 0.8) 100%);
+    }
+    
+    .auth-image-content {
+      position: relative;
+      z-index: 1;
+      color: white;
+      padding: 3rem;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .auth-image-content h2 {
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .auth-image-content p {
+      opacity: 0.9;
+      margin-bottom: 2.5rem;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .feature-list li {
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .feature-list i {
+      margin-right: 0.8rem;
+      font-size: 1.2rem;
+      color: #fff;
+      background: rgba(255,255,255,0.2);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .auth-form {
+      flex: 1;
+      max-width: 500px;
+      background: white;
+      display: flex;
+      flex-direction: column;
     }
     
     .auth-header {
       background: var(--primary-color);
       color: white;
-      padding: 1.5rem;
+      padding: 1.8rem;
       text-align: center;
       position: relative;
     }
     
     .auth-logo {
-      width: 120px;
+      width: 140px;
       margin-bottom: 1rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
     
     .auth-body {
-      padding: 2rem;
-      background: white;
+      padding: 2.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     
     .auth-title {
       font-weight: 600;
       color: var(--text-color);
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+      text-align: center;
     }
     
     .form-floating>label {
       color: #6c757d;
+      padding: 0.8rem 1rem;
     }
     
     .form-control {
       padding: 1rem 1rem;
       border-radius: 8px;
       border: 1px solid #e0e0e0;
+      height: calc(3rem + 2px);
     }
     
     .form-control:focus {
@@ -70,20 +160,24 @@
     .btn-auth {
       background: var(--primary-color);
       border: none;
-      padding: 0.75rem;
+      padding: 0.85rem;
       font-weight: 600;
       border-radius: 8px;
       transition: all 0.3s ease;
+      font-size: 1.05rem;
+      box-shadow: 0 4px 8px rgba(78, 115, 223, 0.3);
     }
     
     .btn-auth:hover {
       background: var(--primary-hover);
       transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(78, 115, 223, 0.35);
     }
     
     .auth-footer {
       text-align: center;
-      margin-top: 1.5rem;
+      margin-top: auto;
+      padding-top: 1.5rem;
       color: var(--text-color);
     }
     
@@ -91,179 +185,172 @@
       color: var(--primary-color);
       text-decoration: none;
       font-weight: 500;
+      transition: all 0.2s;
     }
     
     .auth-link:hover {
       text-decoration: underline;
+      color: var(--primary-hover);
     }
     
     .close-btn {
       position: absolute;
-      top: 15px;
-      left: 15px;
+      top: 20px;
+      left: 20px;
       font-size: 1.5rem;
       color: white;
       background: transparent;
       border: none;
       opacity: 0.8;
-      transition: opacity 0.3s;
+      transition: all 0.3s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
     }
     
     .close-btn:hover {
       opacity: 1;
+      background: rgba(255,255,255,0.1);
     }
     
-    .divider {
-      display: flex;
-      align-items: center;
-      margin: 1.5rem 0;
-      color: #adb5bd;
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #6c757d;
+      cursor: pointer;
+      z-index: 5;
     }
     
-    .divider::before, .divider::after {
-      content: "";
-      flex: 1;
-      border-bottom: 1px solid #dee2e6;
+    @media (max-width: 992px) {
+      .auth-container {
+        height: auto;
+        max-width: 600px;
+      }
+      
+      .auth-image {
+        display: none;
+      }
+      
+      .auth-form {
+        max-width: 100%;
+      }
     }
     
-    .divider::before {
-      margin-right: 1rem;
+    /* Animation for form elements */
+    .form-group {
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
     
-    .divider::after {
-      margin-left: 1rem;
-    }
-    
-    .social-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.75rem;
-      border-radius: 8px;
-      font-weight: 500;
-      margin-bottom: 0.75rem;
-      transition: all 0.3s ease;
-    }
-    
-    .social-btn i {
-      margin-right: 0.5rem;
-      font-size: 1.1rem;
-    }
-    
-    .btn-google {
-      background: #fff;
-      color: #5a5c69;
-      border: 1px solid #e0e0e0;
-    }
-    
-    .btn-google:hover {
-      background: #f8f9fa;
-      border-color: #d1d3e2;
-    }
-    
-    .btn-facebook {
-      background: #3b5998;
-      color: white;
-    }
-    
-    .btn-facebook:hover {
-      background: #344e86;
-      color: white;
+    .form-group:hover {
+      transform: translateX(5px);
     }
   </style>
 </head>
 <body>
-  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="container d-flex justify-content-center align-items-center min-vh-100 py-4">
     <div class="auth-container">
-      <div class="auth-header">
-        <button class="close-btn" onclick="window.location.href='{{ route('landing') }}'">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <img src="{{ asset('avatars/1734019274.png') }}" alt="myPusara Logo" class="auth-logo">
-        <h3 class="mb-0">Selamat Datang Kembali</h3>
+      <!-- Left side with beautiful image -->
+      <div class="auth-image">
+        <div class="auth-image-content">
+          <h2>Memorial Digital Keluarga</h2>
+          <p>Platform komprehensif untuk mengurus dan memperingati pusara keluarga dengan penuh hormat dan kemudahan.</p>
+          <ul class="feature-list">
+            <li><i class="fas fa-monument"></i> Rekod maklumat pusara lengkap</li>
+            <li><i class="fas fa-calendar-check"></i> Peringatan tarikh penting</li>
+            <li><i class="fas fa-map-marked-alt"></i> Lokasi tepat pusara keluarga</li>
+            <li><i class="fas fa-users"></i> Kongsi dengan ahli keluarga</li>
+          </ul>
+        </div>
       </div>
-      <div class="auth-body">
-        <h4 class="auth-title">Log Masuk ke Akaun Anda</h4>
-        
-        @if(session('error'))
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        @endif
-        
-        <form method="POST" action="{{ route('login') }}">
-          @csrf
-          
-          <div class="mb-3">
-            <div class="form-floating">
-              <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                     id="email" name="email" placeholder="name@example.com" 
-                     value="{{ old('email') }}" required autofocus>
-              <label for="email">Alamat Email</label>
-              @error('email')
-                <div class="invalid-feedback">
-                  <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
-                </div>
-              @enderror
-            </div>
-          </div>
-          
-          <div class="mb-3 position-relative">
-            <div class="form-floating">
-              <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                    id="password" name="password" placeholder="Password" required>
-              <label for="password">Kata Laluan</label>
-              @error('password')
-                <div class="invalid-feedback">
-                  <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
-                </div>
-              @enderror
-            </div>
-            <button type="button" class="btn btn-sm position-absolute end-0 top-50 translate-middle-y me-3 text-secondary" 
-                    onclick="togglePassword()" tabindex="-1">
-              <i class="fas fa-eye" id="togglePasswordIcon"></i>
-            </button>
-          </div>
-
-          
-          <!-- <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="remember" id="remember">
-              <label class="form-check-label" for="remember">Ingat Saya</label>
-            </div>
-            <a href="{{ route('password.request') }}" class="auth-link">Lupa Kata Laluan?</a>
-          </div> -->
-          
-          <button type="submit" class="btn btn-auth w-100 mb-3 mt-3">
-            <i class="fas fa-sign-in-alt me-2"></i> Log Masuk
+      
+      <!-- Right side with login form -->
+      <div class="auth-form">
+        <div class="auth-header">
+          <button class="close-btn" onclick="window.location.href='{{ route('landing') }}'">
+            <i class="fas fa-arrow-left"></i>
           </button>
+          <img src="{{ asset('avatars/1734019274.png') }}" alt="myPusara Logo" class="auth-logo">
+          <h3 class="mb-0">Selamat Datang Kembali</h3>
+        </div>
+        <div class="auth-body">
+          <h4 class="auth-title">Log Masuk ke Akaun Anda</h4>
           
-        
-        </form>
-        
-        <div class="auth-footer">
-          Belum ada akaun? <a href="{{ route('register') }}" class="auth-link">Daftar Sekarang</a>
+          @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          @endif
+          
+          <form method="POST" action="{{ route('login') }}">
+            @csrf
+            
+            <div class="mb-4 form-group">
+              <div class="form-floating">
+                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                       id="email" name="email" placeholder="name@example.com" 
+                       value="{{ old('email') }}" required autofocus>
+                <label for="email"><i class="fas fa-envelope me-2"></i>Alamat Email</label>
+                @error('email')
+                  <div class="invalid-feedback">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
+                  </div>
+                @enderror
+              </div>
+            </div>
+            
+            <div class="mb-4 form-group position-relative">
+              <div class="form-floating">
+                <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                      id="password" name="password" placeholder="Password" required>
+                <label for="password"><i class="fas fa-lock me-2"></i>Kata Laluan</label>
+                @error('password')
+                  <div class="invalid-feedback">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
+                  </div>
+                @enderror
+              </div>
+              <button type="button" class="password-toggle" onclick="togglePassword()">
+                <i class="fas fa-eye" id="togglePasswordIcon"></i>
+              </button>
+            </div>
+
+            <button type="submit" class="btn btn-auth w-100 mb-4 mt-2">
+              <i class="fas fa-sign-in-alt me-2"></i> Log Masuk
+            </button>
+          </form>
+          
+          <div class="auth-footer">
+            Belum ada akaun? <a href="{{ route('register') }}" class="auth-link">Daftar Sekarang</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  
   <script>
-  function togglePassword() {
-    const passwordInput = document.getElementById('password');
-    const icon = document.getElementById('togglePasswordIcon');
-    
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      icon.classList.remove('fa-eye');
-      icon.classList.add('fa-eye-slash');
-    } else {
-      passwordInput.type = 'password';
-      icon.classList.remove('fa-eye-slash');
-      icon.classList.add('fa-eye');
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const icon = document.getElementById('togglePasswordIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
     }
-  }
-</script>
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
