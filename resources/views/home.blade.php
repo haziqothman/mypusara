@@ -270,48 +270,50 @@
         </div>
     </div>
 
-    <!-- Care Guide Modal -->
-    <div class="modal fade" id="careGuideModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="fas fa-book-medical me-2"></i> 
-                        Panduan Penjagaan Pusara
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <img src="{{ asset('images/grave-care.jpg') }}" class="img-fluid rounded mb-3" alt="Grave Care">
-                            <h5 class="text-primary">Penjagaan Fizikal</h5>
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Bersihkan kawasan pusara secara berkala</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Gunakan air dan sabun lembut</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Elakkan bahan kimia kuat</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Kawal pertumbuhan rumput liar</li>
-                            </ul>
+  <!-- Care Guide Modal -->
+<div class="modal fade" id="careGuideModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-book-medical me-2"></i> 
+                    Panduan Penjagaan Pusara
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-monument text-primary" style="font-size: 3rem;"></i>
                         </div>
-                        <div class="col-md-6 mb-4">
-                            <img src="{{ asset('images/prayer-guide.jpg') }}" class="img-fluid rounded mb-3" alt="Prayer Guide">
-                            <h5 class="text-primary">Amalan Kerohanian</h5>
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Baca Surah Yasin ketika ziarah</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Hadiahkan bacaan Al-Fatihah</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Baca doa ziarah kubur</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Bersedekah untuk si mati</li>
-                            </ul>
+                        <h5 class="text-primary">Penjagaan Fizikal</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Bersihkan kawasan pusara secara berkala</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Gunakan air dan sabun lembut</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Elakkan bahan kimia kuat</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Kawal pertumbuhan rumput liar</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-hands-praying text-primary" style="font-size: 3rem;"></i>
                         </div>
-                    </div>
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i> Penjagaan yang baik mencerminkan penghormatan kepada yang telah tiada.
+                        <h5 class="text-primary">Amalan Kerohanian</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Baca Surah Yasin ketika ziarah</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Hadiahkan bacaan Al-Fatihah</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Baca doa ziarah kubur</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Bersedekah untuk si mati</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary">Cetak Panduan</button>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Penjagaan yang baik mencerminkan penghormatan kepada yang telah tiada.
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
